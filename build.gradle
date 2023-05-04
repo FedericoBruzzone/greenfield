@@ -123,11 +123,11 @@ test {
 }
 
 // My Tasks
-task runMain(type: JavaExec) {
+task runAdministratorServer(type: JavaExec) {
     group = "Execution"
     description = ""
     classpath = sourceSets.main.runtimeClasspath
-    main = 'Main'
+    main = 'administrator.server.AdministratorServer'
     // args '1234'
     standardInput = System.in // enable standardInput
 }
