@@ -3,7 +3,7 @@ plugins {
     id "java"
     id "war" // for REST
     
-    id "application"
+//    id "application"
 //    id "io.freefair.aspectj" version "6.4.1"
     id "io.freefair.aspectj.post-compile-weaving" version "6.4.1"
 }
@@ -66,9 +66,9 @@ dependencies {
 
 }
 
-run {
-    main = "Main" 
-}
+// run {
+//     main = "Main" 
+// }
 
 //AspectJ
 // configurations {
@@ -80,6 +80,8 @@ run {
 //     }
 // }
 
+
+// AspectJ
 compileJava.ajc.options.compilerArgs = ["-sourceroots", "../../../src/main/aspectj"]
 
 compileJava {
@@ -119,3 +121,31 @@ protobuf {
 test {
     useJUnitPlatform()
 }
+
+// My Tasks
+task runMain(type: JavaExec) {
+    group = "Execution"
+    description = ""
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'Main'
+    // args '1234'
+    standardInput = System.in // enable standardInput
+}
+
+// task runS(type: JavaExec) {
+//     group = "Execution"
+//     description = ""
+//     classpath = sourceSets.main.runtimeClasspath
+//     main = 'sum.App'
+//     // args '1234'
+//     standardInput = System.in // enable standardInput
+// }
+
+// task runC(type: JavaExec) {
+//     group = "Execution"
+//     description = ""
+//     classpath = sourceSets.main.runtimeClasspath
+//     main = 'sum.SumServiceClient'
+//     // args('localhost', '6789') // main args
+//     standardInput = System.in // enable standardInput
+// }
