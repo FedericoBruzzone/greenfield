@@ -2,7 +2,10 @@ plugins {
     id "com.google.protobuf" version "0.8.17" // for GRPC
     id "java"
     id "war" // for REST
+    
     id "application"
+//    id "io.freefair.aspectj" version "6.4.1"
+    id "io.freefair.aspectj.post-compile-weaving" version "6.4.1"
 }
 
 group 'org.example'
@@ -11,6 +14,7 @@ version '1.0-SNAPSHOT'
 repositories {
     mavenCentral()
 }
+
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
@@ -52,14 +56,35 @@ dependencies {
     implementation group: 'com.sun.jersey', name: 'jersey-server', version: '1.2'
 
 
-
     // MQTT Dependencies
     // https://mvnrepository.com/artifact/org.eclipse.paho/org.eclipse.paho.client.mqttv3
     implementation group: 'org.eclipse.paho', name: 'org.eclipse.paho.client.mqttv3', version: '1.2.5'
+
+    // AspectJ Dependencies
+    implementation 'org.aspectj:aspectjrt:1.9.6' // 8
+    implementation 'org.aspectj:aspectjweaver:1.9.6' // 8
+
 }
 
 run {
     main = "Main" 
+}
+
+//AspectJ
+// configurations {
+//     ajc
+//     aspects
+//     aspectCompile
+//     compile{
+//         extendsFrom aspects
+//     }
+// }
+
+compileJava.ajc.options.compilerArgs = ["-sourceroots", "../../../src/main/aspectj"]
+
+compileJava {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
 }
 
 // GRPC
