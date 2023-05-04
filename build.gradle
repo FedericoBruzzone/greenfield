@@ -3,7 +3,7 @@ plugins {
     id "java"
     id "war" // for REST
     
-//    id "application"
+    id "application"
 //    id "io.freefair.aspectj" version "6.4.1"
     id "io.freefair.aspectj.post-compile-weaving" version "6.4.1"
 }
@@ -128,6 +128,15 @@ task runAdministratorServer(type: JavaExec) {
     description = ""
     classpath = sourceSets.main.runtimeClasspath
     main = 'administrator.server.AdministratorServer'
+    // args '1234'
+    standardInput = System.in // enable standardInput
+}
+
+task runAdministratorClient(type: JavaExec) {
+    group = "Execution"
+    description = ""
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'administrator.client.AdministratorClient'
     // args '1234'
     standardInput = System.in // enable standardInput
 }

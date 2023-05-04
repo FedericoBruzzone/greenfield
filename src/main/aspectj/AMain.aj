@@ -4,6 +4,6 @@ public aspect AMain {
         && !within(AMain);
     
     after(): mainMethod() {
-        System.out.println("After main");
+        System.out.println("[AspectJ] ----- After Main -----");
     }
 }
