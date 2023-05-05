@@ -2,7 +2,6 @@ package simulator;
 
 public class PM10Simulator extends Simulator {
 
-
     private final double A = 15;
     private final double W = 0.05;
     private static int ID = 1;
@@ -31,7 +30,6 @@ public class PM10Simulator extends Simulator {
             sensorSleep(waitingTime);
 
             i+=0.2;
-
         }
 
     }

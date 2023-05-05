@@ -17,7 +17,7 @@ public final class AdministratorClient implements IAdministratorClient  {
     public static void main(String[] args) {
         // Try to use a ClientConfig object to configure the client.
         Client client = new Client();
-        IConfigurationHandler configurationHandler = ConfigurationHandler.instance(); 
+        IConfigurationHandler configurationHandler = ConfigurationHandler.getInstance(); 
         String baseUri = configurationHandler.getEndpointAdministratorServer();
         
         int choice = 0; 

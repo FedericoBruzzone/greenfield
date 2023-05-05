@@ -24,7 +24,7 @@ public final class ConfigurationHandler implements IConfigurationHandler {
     }
 
     // Singleton pattern
-    public static ConfigurationHandler instance() {
+    public static ConfigurationHandler getInstance() {
        if (instance == null) {
             synchronized (ConfigurationHandler.class) {
                 if (instance == null) {

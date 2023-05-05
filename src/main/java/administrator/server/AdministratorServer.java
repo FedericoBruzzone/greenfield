@@ -9,8 +9,8 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 
 public final class AdministratorServer implements IAdministratorServer  {
-public static void main(String[] args) {
-        IConfigurationHandler configurationHandler = ConfigurationHandler.instance();
+    public static void main(String[] args) {
+        IConfigurationHandler configurationHandler = ConfigurationHandler.getInstance();
         String serverURI = configurationHandler.getEndpointAdministratorServer();
         try {
             final HttpServer httpServer = HttpServerFactory.create(serverURI + "/");
