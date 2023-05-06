@@ -14,3 +14,15 @@ org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Request window/showMessageRequ
 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
 	at java.lang.Thread.run(Thread.java:750)
 [0m
+2023.05.06 17:21:59 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /home/federicobruzzoneplasma/Documents/FedericoBruzzone/greenfield/.metals/lsp.trace.json or /home/federicobruzzoneplasma/.cache/metals/lsp.trace.json[0m
+2023.05.06 17:21:59 INFO  logging to file /home/federicobruzzoneplasma/Documents/FedericoBruzzone/greenfield/.metals/metals.log[0m
+2023.05.06 17:21:59 INFO  Started: Metals version 0.11.2 in workspace '/home/federicobruzzoneplasma/Documents/FedericoBruzzone/greenfield' for client coc.nvim 0.0.82.[0m
+2023.05.06 17:22:00 INFO  time: initialize in 1.08s[0m
+2023.05.06 17:22:00 WARN  Build server is not auto-connectable.[0m
+2023.05.06 17:22:01 INFO  skipping build import with status 'Requested'[0m
+2023.05.06 17:25:09 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /home/federicobruzzoneplasma/Documents/FedericoBruzzone/greenfield/.metals/lsp.trace.json or /home/federicobruzzoneplasma/.cache/metals/lsp.trace.json[0m
+2023.05.06 17:25:09 INFO  logging to file /home/federicobruzzoneplasma/Documents/FedericoBruzzone/greenfield/.metals/metals.log[0m
+2023.05.06 17:25:09 INFO  Started: Metals version 0.11.2 in workspace '/home/federicobruzzoneplasma/Documents/FedericoBruzzone/greenfield' for client coc.nvim 0.0.82.[0m
+2023.05.06 17:25:10 INFO  time: initialize in 0.61s[0m
+2023.05.06 17:25:10 WARN  Build server is not auto-connectable.[0m
+2023.05.06 17:25:10 INFO  skipping build import with status 'Requested'[0m
