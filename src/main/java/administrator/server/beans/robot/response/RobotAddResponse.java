@@ -3,20 +3,25 @@ package administrator.server.beans.robot.response;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import administrator.server.beans.robot.ICleaningRobot;
+import administrator.server.beans.robot.CleaningRobots;
 
 import java.util.List;
 
 @XmlRootElement
 public class RobotAddResponse implements IResponse {
-    private List<ICleaningRobot> listCleaningRobot;
-    private String district;
+    private List<ICleaningRobot> listActiveCleaningRobot;
+    private int district;
 
-    public RobotAddResponse(List<ICleaningRobot> listCleaningRobot) {
-        this.listCleaningRobot = listCleaningRobot;
-        district = generateDistrict();
+    public RobotAddResponse() {
+        this.listActiveCleaningRobot = CleaningRobots.getInstance().getCleaningRobots();
+        this.district = getDistrict();
     }
 
-    public String generateDistrict() {
-           
+    public int getDistrict() {
+        return CleaningRobots.getInstance()
+                             .getDistricts()
+                             .stream()
+                             .min(Integer::compare)
+                             .get(); 
     }
 }

@@ -2,7 +2,6 @@ package administrator.client;
 
 import administrator.IAdministratorClient;
 import util.ConfigurationHandler;
-import util.IConfigurationHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +16,7 @@ public final class AdministratorClient implements IAdministratorClient  {
     public static void main(String[] args) {
         // Try to use a ClientConfig object to configure the client.
         Client client = new Client();
-        IConfigurationHandler configurationHandler = ConfigurationHandler.getInstance(); 
+        ConfigurationHandler configurationHandler = ConfigurationHandler.getInstance(); 
         String baseUri = configurationHandler.getEndpointAdministratorServer();
         
         int choice = 0; 

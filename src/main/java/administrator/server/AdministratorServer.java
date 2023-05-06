@@ -1,7 +1,6 @@
 package administrator.server;
 
 import administrator.IAdministratorServer;
-import util.IConfigurationHandler; 
 import util.ConfigurationHandler; 
 
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
@@ -10,7 +9,7 @@ import java.io.IOException;
 
 public final class AdministratorServer implements IAdministratorServer  {
     public static void main(String[] args) {
-        IConfigurationHandler configurationHandler = ConfigurationHandler.getInstance();
+        ConfigurationHandler configurationHandler = ConfigurationHandler.getInstance();
         String serverURI = configurationHandler.getEndpointAdministratorServer();
         try {
             final HttpServer httpServer = HttpServerFactory.create(serverURI + "/");

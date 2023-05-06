@@ -2,6 +2,7 @@ package administrator.server.beans.robot;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -39,7 +40,14 @@ public final class CleaningRobots implements ICleaningRobots {
         checkID(cleaningRobot.getID());
         cleaningRobotsList.add(cleaningRobot);
     }
-   
+
+    public List<Integer> getDistricts() {
+        return cleaningRobotsList.stream()
+                                 .map(cleaningRobot -> cleaningRobot.getDistrict())
+                                 .distinct()
+                                 .collect(Collectors.toList());    
+    }
+
     public synchronized void setCleaningRobots(List<ICleaningRobot> cleaningRobotsList) {
         // check if all ID are unique
         this.cleaningRobotsList = cleaningRobotsList;

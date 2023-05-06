@@ -1,16 +1,23 @@
 package robot;
 
+import util.ConfigurationHandler;
+import util.RestHandler;
+
+import com.google.gson.Gson;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+
 public class CleaningRobot implements ICleaningRobot {
-    private final int ID;
-
-    public CleaningRobot(int ID) {
-        this.ID = ID;
+    
+    public static void main(String[] args) {
+        ConfigurationHandler configurationHandler = ConfigurationHandler.getInstance();
+        String serverURI = configurationHandler.getEndpointAdministratorServer();
+        
+        Client client = Client.create();
+        
     }
-
-    public int getID() {
-        return this.ID;
-    }
-
     // main
     // instance of server (connect to server)
     // chiedo di entrare

@@ -4,6 +4,7 @@ import administrator.server.beans.robot.CleaningRobots;
 import administrator.server.beans.robot.ICleaningRobots;
 import administrator.server.beans.robot.CleaningRobot;
 import administrator.server.beans.robot.ICleaningRobot;
+import administrator.server.beans.robot.response.IResponse;
 import administrator.server.beans.robot.response.RobotAddResponse;
 
 import java.util.List;
@@ -27,8 +28,7 @@ public class RobotCleaningService {
     @Produces({"application/json", "application/xml"})
     public Response addCleaningRobot(ICleaningRobot cleaningRobot){
         CleaningRobots.getInstance().add(cleaningRobot);
-        List<ICleaningRobot> listCleaningRobot = CleaningRobots.getInstance().getCleaningRobots();
-        RobotAddResponse robotAddResponse = new RobotAddResponse(listCleaningRobot);
+        IResponse robotAddResponse = new RobotAddResponse();
         return Response.ok(robotAddResponse).build();
     }
 
