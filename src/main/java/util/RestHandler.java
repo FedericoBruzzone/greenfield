@@ -17,5 +17,4 @@ public class RestHandler {
             return null;
         }
     }
-
 }

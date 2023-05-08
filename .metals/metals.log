@@ -38,3 +38,15 @@ org.eclipse.lsp4j.jsonrpc.ResponseErrorException: Request window/showMessageRequ
 2023.05.06 17:27:26 INFO  time: initialize in 1.14s[0m
 2023.05.06 17:27:26 WARN  Build server is not auto-connectable.[0m
 2023.05.06 17:27:26 INFO  skipping build import with status 'Requested'[0m
+2023.05.07 13:23:35 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /home/federicobruzzoneplasma/Documents/FedericoBruzzone/greenfield/.metals/lsp.trace.json or /home/federicobruzzoneplasma/.cache/metals/lsp.trace.json[0m
+2023.05.07 13:23:36 INFO  logging to file /home/federicobruzzoneplasma/Documents/FedericoBruzzone/greenfield/.metals/metals.log[0m
+2023.05.07 13:23:36 INFO  Started: Metals version 0.11.2 in workspace '/home/federicobruzzoneplasma/Documents/FedericoBruzzone/greenfield' for client coc.nvim 0.0.82.[0m
+2023.05.07 13:23:37 INFO  time: initialize in 0.94s[0m
+2023.05.07 13:23:37 WARN  Build server is not auto-connectable.[0m
+2023.05.07 13:23:37 INFO  skipping build import with status 'Requested'[0m
+2023.05.08 12:43:41 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /home/federicobruzzoneplasma/Documents/FedericoBruzzone/greenfield/.metals/lsp.trace.json or /home/federicobruzzoneplasma/.cache/metals/lsp.trace.json[0m
+2023.05.08 12:43:41 INFO  logging to file /home/federicobruzzoneplasma/Documents/FedericoBruzzone/greenfield/.metals/metals.log[0m
+2023.05.08 12:43:41 INFO  Started: Metals version 0.11.2 in workspace '/home/federicobruzzoneplasma/Documents/FedericoBruzzone/greenfield' for client coc.nvim 0.0.82.[0m
+2023.05.08 12:43:42 INFO  time: initialize in 0.85s[0m
+2023.05.08 12:43:43 WARN  Build server is not auto-connectable.[0m
+2023.05.08 12:43:43 INFO  skipping build import with status 'Requested'[0m
