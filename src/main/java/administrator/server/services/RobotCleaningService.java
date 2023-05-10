@@ -28,7 +28,7 @@ public class RobotCleaningService {
     @Produces({"application/json", "application/xml"})
     public Response addCleaningRobot(CommonCleaningRobot cleaningRobot){
         CommonCleaningRobot newCleaningRobot = CleaningRobots.getInstance().add(cleaningRobot);
-        RobotAddResponse robotAddResponse = new RobotAddResponse(CleaningRobots.getInstance().getCleaningRobots(), newCleaningRobot.getDistrict());
+        RobotAddResponse robotAddResponse = new RobotAddResponse(CleaningRobots.getInstance().getCleaningRobotsWithout(cleaningRobot), newCleaningRobot.getDistrict());
         System.out.println("/robot/add " + CleaningRobots.getInstance().getCleaningRobots());
         return Response.ok(robotAddResponse).build();
     }

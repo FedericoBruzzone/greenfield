@@ -40,7 +40,13 @@ public final class CleaningRobots implements ICleaningRobots {
     public synchronized List<CommonCleaningRobot> getCleaningRobots() {
         return new ArrayList<CommonCleaningRobot>(cleaningRobotsList);
     }
-    
+   
+    public synchronized List<CommonCleaningRobot> getCleaningRobotsWithout(CommonCleaningRobot commonCleaningRobot) {
+        return new ArrayList<CommonCleaningRobot>(cleaningRobotsList.stream()
+                                                                    .filter(cleaningRobot -> cleaningRobot.getId() != commonCleaningRobot.getId())
+                                                                    .collect(Collectors.toList()));
+    }
+
     public synchronized CommonCleaningRobot add(CommonCleaningRobot cleaningRobot) {
         if (!checkID(cleaningRobot.getId())) {
             throw new RuntimeException("Failed: There is another Cleaning Robot with this ID "+cleaningRobot.getId());

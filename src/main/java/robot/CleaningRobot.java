@@ -5,6 +5,8 @@ import util.ConfigurationHandler;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.sun.jersey.api.client.Client;
@@ -16,25 +18,27 @@ import common.response.IResponse;
 import common.response.RobotAddResponse;
 
 public class CleaningRobot implements ICleaningRobot {
-    private int ID;
+    private int Id;
     private int district; 
     private String administratorServerURI;
-    
+    private List<CleaningRobotInfo> activeCleaningRobot;
+
     private AdministratorServerHandler administratorServerHandler;
     private Client client;
 
     public CleaningRobot() {}
 
-    public CleaningRobot(int ID) {
-        this.ID = ID;
+    public CleaningRobot(int Id) {
+        this.Id = Id;
         this.district = -1;
+        this.activeCleaningRobot = null;
         this.administratorServerURI = configureAdministratorServerURI(); 
         this.client = Client.create();
         this.administratorServerHandler = new AdministratorServerHandler(this.client, this.administratorServerURI);
     }
 
     public int getID() {
-        return this.ID;
+        return this.Id;
     }
     
     public String getServerURI() {
@@ -48,8 +52,12 @@ public class CleaningRobot implements ICleaningRobot {
     public void registerToAdministratorServer() {
         ClientResponse clientResponse = administratorServerHandler.registerCleaningRobot(this);
         RobotAddResponse robotAddResponse = clientResponse.getEntity(RobotAddResponse.class);
-        System.out.println("Response: " + robotAddResponse);
-        // set fields
+        System.out.println("Response: " + robotAddResponse);        
+        this.district = robotAddResponse.district;
+        this.activeCleaningRobot = robotAddResponse.listActiveCleaningRobot
+                                                   .stream()
+                                                   .map(cr -> new CleaningRobotInfo(cr.getId()))
+                                                   .collect(Collectors.toList());
     }
 
     private String configureAdministratorServerURI() {
@@ -67,17 +75,15 @@ public class CleaningRobot implements ICleaningRobot {
 
     public static void main(String[] args) {
         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Insert ID: ");
+        System.out.println("Insert Id: ");
         try {
-            int ID = Integer.parseInt(inFromUser.readLine());  
-            ICleaningRobot cleaningRobot = new CleaningRobot(ID);
+            int Id = Integer.parseInt(inFromUser.readLine());  
+            ICleaningRobot cleaningRobot = new CleaningRobot(Id);
             cleaningRobot.registerToAdministratorServer();
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
-         
-        
     }
     // main
     // instance of server (connect to server)
