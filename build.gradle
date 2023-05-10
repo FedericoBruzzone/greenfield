@@ -141,6 +141,15 @@ task runAdministratorClient(type: JavaExec) {
     standardInput = System.in // enable standardInput
 }
 
+task runCleaningRobotClient(type: JavaExec) {
+    group = "Execution"
+    description = ""
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'robot.CleaningRobot'
+    // args '1234'
+    standardInput = System.in // enable standardInput
+}
+
 // task runS(type: JavaExec) {
 //     group = "Execution"
 //     description = ""

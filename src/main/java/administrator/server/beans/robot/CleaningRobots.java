@@ -3,22 +3,27 @@ package administrator.server.beans.robot;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import java.util.Collections;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.google.api.SystemParameter;
+
+import common.CommonICleaningRobot;
+import common.CommonCleaningRobot;
+
 @XmlRootElement
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public final class CleaningRobots implements ICleaningRobots {
     
     private static CleaningRobots instance;
-    @XmlElement(name = "cleaningRobot")
-    private List<ICleaningRobot> cleaningRobotsList;
-
+    private List<CommonCleaningRobot> cleaningRobotsList;
+    
     private CleaningRobots() {
-        cleaningRobotsList = new ArrayList<ICleaningRobot>();
+        cleaningRobotsList = new ArrayList<CommonCleaningRobot>();
     }
 
     public static CleaningRobots getInstance() {
@@ -32,13 +37,25 @@ public final class CleaningRobots implements ICleaningRobots {
         return instance;
     }
    
-    public synchronized List<ICleaningRobot> getCleaningRobots() {
-        return new ArrayList<ICleaningRobot>(cleaningRobotsList);
+    public synchronized List<CommonCleaningRobot> getCleaningRobots() {
+        return new ArrayList<CommonCleaningRobot>(cleaningRobotsList);
     }
     
-    public synchronized void add(ICleaningRobot cleaningRobot) {
-        checkID(cleaningRobot.getID());
+    public synchronized CommonCleaningRobot add(CommonCleaningRobot cleaningRobot) {
+        if (!checkID(cleaningRobot.getId())) {
+            throw new RuntimeException("Failed: There is another Cleaning Robot with this ID "+cleaningRobot.getId());
+        }
+        cleaningRobot.setDistrict(buildDistrict());
         cleaningRobotsList.add(cleaningRobot);
+        return cleaningRobot;
+    }
+
+    public int buildDistrict() {
+        return CleaningRobots.getInstance()
+                      .getDistricts()
+                      .stream()
+                      .reduce(0L, (count, n) -> count + 1, Long::min)
+                      .intValue() % 4;
     }
 
     public List<Integer> getDistricts() {
@@ -48,14 +65,13 @@ public final class CleaningRobots implements ICleaningRobots {
                                  .collect(Collectors.toList());    
     }
 
-    public synchronized void setCleaningRobots(List<ICleaningRobot> cleaningRobotsList) {
+    public synchronized void setCleaningRobots(List<CommonCleaningRobot> cleaningRobotsList) {
         // check if all ID are unique
         this.cleaningRobotsList = cleaningRobotsList;
     }
     
     private boolean checkID(int ID) {
-        return cleaningRobotsList.stream().anyMatch(cleaningRobot -> cleaningRobot.getID() == ID);
+        return !cleaningRobotsList.stream().anyMatch(cleaningRobot -> cleaningRobot.getId() == ID);
     }
-
 
 }

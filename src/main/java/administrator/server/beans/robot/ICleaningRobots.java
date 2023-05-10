@@ -2,10 +2,13 @@ package administrator.server.beans.robot;
 
 import java.util.List;
 
+import common.CommonICleaningRobot;
+import common.CommonCleaningRobot;
+
 public interface ICleaningRobots {
-    public List<ICleaningRobot> getCleaningRobots();
-    public void add(ICleaningRobot cleaningRobot);
+    public List<CommonCleaningRobot> getCleaningRobots();
+    public CommonCleaningRobot add(CommonCleaningRobot cleaningRobot);
     public List<Integer> getDistricts();
-    public void setCleaningRobots(List<ICleaningRobot> cleaningRobots);
+    public void setCleaningRobots(List<CommonCleaningRobot> cleaningRobots);
 
 }

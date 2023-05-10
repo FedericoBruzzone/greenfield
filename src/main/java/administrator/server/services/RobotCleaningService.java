@@ -1,11 +1,11 @@
 package administrator.server.services;
 
+import common.CommonCleaningRobot;
 import administrator.server.beans.robot.CleaningRobots;
+import common.CommonICleaningRobot;
+import common.response.IResponse;
+import common.response.RobotAddResponse;
 import administrator.server.beans.robot.ICleaningRobots;
-import administrator.server.beans.robot.CleaningRobot;
-import administrator.server.beans.robot.ICleaningRobot;
-import administrator.server.beans.robot.response.IResponse;
-import administrator.server.beans.robot.response.RobotAddResponse;
 
 import java.util.List;
 
@@ -26,9 +26,10 @@ public class RobotCleaningService {
     @POST
     @Consumes({"application/json", "application/xml"})
     @Produces({"application/json", "application/xml"})
-    public Response addCleaningRobot(ICleaningRobot cleaningRobot){
-        CleaningRobots.getInstance().add(cleaningRobot);
-        IResponse robotAddResponse = new RobotAddResponse();
+    public Response addCleaningRobot(CommonCleaningRobot cleaningRobot){
+        CommonCleaningRobot newCleaningRobot = CleaningRobots.getInstance().add(cleaningRobot);
+        RobotAddResponse robotAddResponse = new RobotAddResponse(CleaningRobots.getInstance().getCleaningRobots(), newCleaningRobot.getDistrict());
+        System.out.println("/robot/add " + CleaningRobots.getInstance().getCleaningRobots());
         return Response.ok(robotAddResponse).build();
     }
 
