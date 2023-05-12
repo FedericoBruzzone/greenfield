@@ -24,4 +24,13 @@ public class AdministratorServerHandler {
         return clientResponse;
     }
 
+    public ClientResponse removeCleaningRobot(ICleaningRobot cleaningRobot) {
+        CommonCleaningRobot commonCleaningRobot = new CommonCleaningRobot(cleaningRobot.getID());
+        ClientResponse clientResponse = RestHandler.deleteRequest(client, administratorServerURI+"/robot/remove", commonCleaningRobot);
+        if (clientResponse.getStatus() != 200) {
+            throw new RuntimeException("Failed [" +clientResponse.getStatus()+ "]: There is no Cleaning Robot with this ID ");
+        }
+        return clientResponse;
+    }
+
 }

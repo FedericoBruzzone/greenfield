@@ -17,4 +17,17 @@ public class RestHandler {
             return null;
         }
     }
+
+
+    public static <T> ClientResponse deleteRequest(Client client, String url, T u){
+        WebResource webResource = client.resource(url);
+        String input = new Gson().toJson(u);
+        try {
+            return webResource.type("application/json").delete(ClientResponse.class, input);
+        } catch (ClientHandlerException e) {
+            e.printStackTrace();
+            return null;
+        }
+    } 
+
 }

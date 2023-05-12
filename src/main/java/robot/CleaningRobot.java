@@ -18,7 +18,7 @@ import common.response.IResponse;
 import common.response.RobotAddResponse;
 
 public class CleaningRobot implements ICleaningRobot {
-    private int Id;
+    private int id;
     private int district; 
     private String administratorServerURI;
     private List<CleaningRobotInfo> activeCleaningRobot;
@@ -28,17 +28,18 @@ public class CleaningRobot implements ICleaningRobot {
 
     public CleaningRobot() {}
 
-    public CleaningRobot(int Id) {
-        this.Id = Id;
+    public CleaningRobot(int id) {
+        this.id = id;
         this.district = -1;
         this.activeCleaningRobot = null;
         this.administratorServerURI = configureAdministratorServerURI(); 
         this.client = Client.create();
         this.administratorServerHandler = new AdministratorServerHandler(this.client, this.administratorServerURI);
+        this.activeCleaningRobot = null;
     }
 
     public int getID() {
-        return this.Id;
+        return this.id;
     }
     
     public String getServerURI() {
@@ -49,17 +50,6 @@ public class CleaningRobot implements ICleaningRobot {
         return this.district;
     }
     
-    public void registerToAdministratorServer() {
-        ClientResponse clientResponse = administratorServerHandler.registerCleaningRobot(this);
-        RobotAddResponse robotAddResponse = clientResponse.getEntity(RobotAddResponse.class);
-        System.out.println("Response: " + robotAddResponse);        
-        this.district = robotAddResponse.district;
-        this.activeCleaningRobot = robotAddResponse.listActiveCleaningRobot
-                                                   .stream()
-                                                   .map(cr -> new CleaningRobotInfo(cr.getId()))
-                                                   .collect(Collectors.toList());
-    }
-
     private String configureAdministratorServerURI() {
         ConfigurationHandler configurationHandler = ConfigurationHandler.getInstance();
         return configurationHandler.getEndpointAdministratorServer();
@@ -72,15 +62,69 @@ public class CleaningRobot implements ICleaningRobot {
     public void setAdministratorServerHandler(AdministratorServerHandler administratorServerHandler) {
         this.administratorServerHandler = administratorServerHandler;
     }
+    
+    public void registerToAdministratorServer() {
+        ClientResponse clientResponse = administratorServerHandler.registerCleaningRobot(this);
+        RobotAddResponse robotAddResponse = clientResponse.getEntity(RobotAddResponse.class);
+        // System.out.println("Response: " + robotAddResponse);        
+        System.out.println("Response: " + clientResponse);        
+        this.district = robotAddResponse.district;
+        this.activeCleaningRobot = robotAddResponse.listActiveCleaningRobot != null ? 
+                                    robotAddResponse.listActiveCleaningRobot
+                                                    .stream()
+                                                    .map(cr -> new CleaningRobotInfo(cr.getId()))
+                                                    .collect(Collectors.toList()) : null;
+    }
+    
+    public void removeFromAdministratorServer() {
+        ClientResponse clientResponse = administratorServerHandler.removeCleaningRobot(this);
+        System.out.println("Response: " + clientResponse);
+    }
+
+    private static void printMenu() {
+        System.out.println("Type:\n" +
+                               "\t- 0 quit\n" +
+                               "\t- 1 delete\n" +
+                               "\t- 2 recharge\n");
+    }
 
     public static void main(String[] args) {
-        BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Insert Id: ");
+        BufferedReader inFromUserId = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("Insert id: ");
         try {
-            int Id = Integer.parseInt(inFromUser.readLine());  
-            ICleaningRobot cleaningRobot = new CleaningRobot(Id);
+            int id = Integer.parseInt(inFromUserId.readLine());  
+            ICleaningRobot cleaningRobot = new CleaningRobot(id);
             cleaningRobot.registerToAdministratorServer();
-            
+            int choice;
+            while(true) { 
+                printMenu();
+
+                BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
+                try {
+                    choice = Integer.parseInt(inFromUser.readLine());
+                    switch (choice) {
+                        case 0:
+                            System.out.println("quit");
+                            // TODO send to the other robot?
+                            // cleaningRobot.removeFromAdministratorServer();
+                            System.exit(1);
+                        case 1:
+                            System.out.println("delete");
+                            // TODO send to the other robot?
+                            cleaningRobot.removeFromAdministratorServer();
+                            System.exit(1);
+                        case 2:
+                            System.out.println("recharge");
+                            // TODO
+                            break;
+                        default:
+                            System.out.println("This choice is not available.");
+                            break;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

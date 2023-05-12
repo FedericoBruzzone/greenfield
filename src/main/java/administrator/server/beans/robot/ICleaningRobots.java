@@ -9,6 +9,7 @@ public interface ICleaningRobots {
     public List<CommonCleaningRobot> getCleaningRobots();
     public List<CommonCleaningRobot> getCleaningRobotsWithout(CommonCleaningRobot cleaningRobot);
     public CommonCleaningRobot add(CommonCleaningRobot cleaningRobot);
+    public Boolean remove(CommonCleaningRobot cleaningRobot);
     public List<Integer> getDistricts();
     public void setCleaningRobots(List<CommonCleaningRobot> cleaningRobots);
 

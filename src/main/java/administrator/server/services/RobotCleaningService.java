@@ -28,9 +28,26 @@ public class RobotCleaningService {
     @Produces({"application/json", "application/xml"})
     public Response addCleaningRobot(CommonCleaningRobot cleaningRobot){
         CommonCleaningRobot newCleaningRobot = CleaningRobots.getInstance().add(cleaningRobot);
-        RobotAddResponse robotAddResponse = new RobotAddResponse(CleaningRobots.getInstance().getCleaningRobotsWithout(cleaningRobot), newCleaningRobot.getDistrict());
+        if (newCleaningRobot == null) {
+            return Response.status(Response.Status.CONFLICT).build();
+        }
+        RobotAddResponse robotAddResponse = new RobotAddResponse(CleaningRobots.getInstance().getCleaningRobotsWithout(cleaningRobot), 
+                                                                 newCleaningRobot.getDistrict());
         System.out.println("/robot/add " + CleaningRobots.getInstance().getCleaningRobots());
         return Response.ok(robotAddResponse).build();
+    }
+    
+    @Path("remove")
+    @DELETE
+    @Consumes({"application/json", "application/xml"})
+    public Response removeCleaningRobot(CommonCleaningRobot cleaningRobot){
+        if (CleaningRobots.getInstance().remove(cleaningRobot)) {
+            System.out.println("/robot/remove " + CleaningRobots.getInstance().getCleaningRobots());
+            return Response.ok().build(); 
+        }
+        else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
     }
 
     ////permette di prelevare un utente con un determinato nome

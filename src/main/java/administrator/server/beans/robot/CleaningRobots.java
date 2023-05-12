@@ -37,24 +37,38 @@ public final class CleaningRobots implements ICleaningRobots {
         return instance;
     }
    
-    public synchronized List<CommonCleaningRobot> getCleaningRobots() {
-        return new ArrayList<CommonCleaningRobot>(cleaningRobotsList);
-    }
-   
-    public synchronized List<CommonCleaningRobot> getCleaningRobotsWithout(CommonCleaningRobot commonCleaningRobot) {
-        return new ArrayList<CommonCleaningRobot>(cleaningRobotsList.stream()
-                                                                    .filter(cleaningRobot -> cleaningRobot.getId() != commonCleaningRobot.getId())
-                                                                    .collect(Collectors.toList()));
-    }
-
     public synchronized CommonCleaningRobot add(CommonCleaningRobot cleaningRobot) {
         if (!checkID(cleaningRobot.getId())) {
-            throw new RuntimeException("Failed: There is another Cleaning Robot with this ID "+cleaningRobot.getId());
+            // throw new RuntimeException("Failed: There is another Cleaning Robot with this ID "+cleaningRobot.getId());
+            return null;
         }
         cleaningRobot.setDistrict(buildDistrict());
         cleaningRobotsList.add(cleaningRobot);
         return cleaningRobot;
     }
+    
+    public synchronized Boolean remove(CommonCleaningRobot cleaningRobot) {
+        if (cleaningRobot == null) {
+            return false;
+        }
+        cleaningRobotsList.removeIf(cr -> cr.getId() == cleaningRobot.getId());
+        return true;
+    }
+
+    public synchronized List<CommonCleaningRobot> getCleaningRobots() {
+        if (cleaningRobotsList != null)
+            return new ArrayList<CommonCleaningRobot>(cleaningRobotsList);
+        return null;
+    }
+   
+    public synchronized List<CommonCleaningRobot> getCleaningRobotsWithout(CommonCleaningRobot commonCleaningRobot) {
+        if (cleaningRobotsList != null && commonCleaningRobot != null)
+            return new ArrayList<CommonCleaningRobot>(cleaningRobotsList.stream()
+                                                                    .filter(cleaningRobot -> cleaningRobot.getId() != commonCleaningRobot.getId())
+                                                                    .collect(Collectors.toList()));
+        return null;
+    }
+
 
     public int buildDistrict() {
         return CleaningRobots.getInstance()
