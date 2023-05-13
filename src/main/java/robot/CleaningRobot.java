@@ -95,6 +95,10 @@ public class CleaningRobot implements ICleaningRobot {
             int id = Integer.parseInt(inFromUserId.readLine());  
             ICleaningRobot cleaningRobot = new CleaningRobot(id);
             cleaningRobot.registerToAdministratorServer();
+            
+            //TODO hello to other robots
+                        
+
             int choice;
             while(true) { 
                 printMenu();
