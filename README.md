@@ -18,42 +18,63 @@
 
 - Gradle >= 7.4.2 
 
-## Compile and run
+## Run, Compile and Build
 
 > You can use `gradle` or `./gradlew`  
 
-**First of all run `gradle` or `./gradlew` to check that everything is OK.**
 
-#### Compile java with aspectj:
+### Run
 
+Running gradle tasks will automatically compile the necessary files.
 
-```
-gradle :compileJava
-```
+**Mosquitto**
 
-or
+- Start mosquitto broker
+    
+    `sudo service mosquitto start` or `sudo systemctl start mosquitto`
 
-```
-./gradlew :compileJava
-```
+- Stop mosquitto broker
 
-Note that `.aj` files must be on `src/main/aspectj` folder.
+    `sudo service mosquitto stop` or `sudo systemctl stop mosquitto`
 
-If you want to put `.aj` file on the same directory of `.java` files, 
+- Status mosquitto broker
+
+    `sudo service mosquitto status` or `sudo systemctl status mosquitto`
+
+**Cleaning Robot**
+
+- Start one cleaning robot:
+    `gradle runCleaningRobotClient --console=plain` or `./gradlew runCleaningRobotClient --console=plain``
+
+**Administrator Server**
+
+- Start administrator server:
+   
+   `gradle runAdministratorServer --console=plain` or `./gradlew runAdministratorServer --console=plain` 
+
+**Administrator Client**
+
+- Start administrator client:
+   
+   `gradle runAdministratorClient --console=plain` or `./gradlew runAdministratorClient --console=plain` 
+
+### Compile 
+
+First of all run `gradle` or `./gradlew` to check that everything is OK.
+
+**Compile <small>[java with aspectj]</small>:**
+
+*Note that `.aj` files must be on `src/main/aspectj` folder.*
+
+- `gradle :compileJava` or `./gradlew :compileJava`
+
+> If you want to put `.aj` file on the same directory of `.java` files, 
 you should replace on `build.gradle` file `compileJava.ajc.options.compilerArgs = ["-sourceroots", "../../../src/main/aspectj"]` 
 with `compileJava.ajc.options.compilerArgs=["-sourceroots", sourceSets.main.java.sourceDirectories.getAsPath()]`
 
-#### Build project: 
+### Build
 
-```
-gradle build
-```
-
-or
-
-```
-./gradlew build
-```
+- `gradle build` or `./gradlew build`
 
 
 
