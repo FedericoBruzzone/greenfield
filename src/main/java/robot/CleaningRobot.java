@@ -83,9 +83,9 @@ public class CleaningRobot implements ICleaningRobot {
 
     private static void printMenu() {
         System.out.println("Type:\n" +
-                               "\t- 0 quit\n" +
-                               "\t- 1 delete\n" +
-                               "\t- 2 recharge\n");
+                               "\t- 0 crash\n" +
+                               "\t- 1 quit\n" +
+                               "\t- 2 fix\n");
     }
 
     public static void main(String[] args) {
@@ -108,17 +108,18 @@ public class CleaningRobot implements ICleaningRobot {
                     choice = Integer.parseInt(inFromUser.readLine());
                     switch (choice) {
                         case 0:
-                            System.out.println("quit");
+                            System.out.println("crash");
                             // TODO send to the other robot?
                             // cleaningRobot.removeFromAdministratorServer();
-                            System.exit(1);
+                            System.exit(0);
                         case 1:
-                            System.out.println("delete");
+                            System.out.println("quit");
+                            // TODO complete any operation at the mechanic 
                             // TODO send to the other robot?
                             cleaningRobot.removeFromAdministratorServer();
                             System.exit(1);
                         case 2:
-                            System.out.println("recharge");
+                            System.out.println("fix");
                             // TODO
                             break;
                         default:

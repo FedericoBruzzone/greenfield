@@ -14,17 +14,17 @@ public class MqttClientFactory {
         broker = configurationHandler.getEndpointBroker();
     }
 
-    public static MqttClient createMqttClient() {
+    public static MqttAsyncClient createMqttClient() {
         try {
-            String clientId = MqttClient.generateClientId(); 
-            // MqttAsyncClient mqttClient = new MqttAsyncClient(broker, clientId);
-            MqttClient mqttClient = new MqttClient(broker, clientId);
+            String mqttClientId = MqttClient.generateClientId(); 
+            MqttAsyncClient mqttClient = new MqttAsyncClient(broker, mqttClientId);
+            // MqttClient mqttClient = new MqttClient(broker, mqttClientId );
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
             mqttConnectOptions.setCleanSession(true);
             mqttConnectOptions.setAutomaticReconnect(true);
             mqttConnectOptions.setConnectionTimeout(10);
             mqttConnectOptions.setKeepAliveInterval(10);
-            mqttClient.connect(mqttConnectOptions);
+            mqttClient.connect(mqttConnectOptions).waitForCompletion();
 
             return mqttClient;
         } catch (MqttException e) {
