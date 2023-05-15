@@ -98,26 +98,27 @@ public class CleaningRobot implements ICleaningRobot {
             
             //TODO hello to other robots
                         
-
             int choice;
             while(true) { 
                 printMenu();
 
                 BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-                try {
+                // try {
                     choice = Integer.parseInt(inFromUser.readLine());
                     switch (choice) {
                         case 0:
                             System.out.println("crash");
                             // TODO send to the other robot?
                             // cleaningRobot.removeFromAdministratorServer();
-                            System.exit(0);
+                            System.exit(1);
                         case 1:
                             System.out.println("quit");
                             // TODO complete any operation at the mechanic 
                             // TODO send to the other robot?
                             cleaningRobot.removeFromAdministratorServer();
-                            System.exit(1);
+                            // Close simulator threads
+                            // Close Mqtt broker
+                            System.exit(0);
                         case 2:
                             System.out.println("fix");
                             // TODO
@@ -126,9 +127,9 @@ public class CleaningRobot implements ICleaningRobot {
                             System.out.println("This choice is not available.");
                             break;
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                // } catch (IOException e) {
+                //     e.printStackTrace();
+                // }
             }
         } catch (IOException e) {
             e.printStackTrace();

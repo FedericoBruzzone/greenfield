@@ -12,11 +12,9 @@ public class SlidingWindow implements Buffer {
         this.buffer = buffer;
     }
 
-    
     public synchronized void addMeasurement(Measurement m) {
         // TODO
     }
-
     
     public synchronized List<Measurement> readAllAndClean() {
         //TODO

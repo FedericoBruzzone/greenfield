@@ -36,6 +36,5 @@ public class PM10Simulator extends Simulator {
 
     private double getPM10Value(double t){
         return Math.abs(A * Math.sin(W*t) + rnd.nextGaussian()*0.1)+15;
-
     }
 }
