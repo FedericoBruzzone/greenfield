@@ -72,10 +72,10 @@ public final class CleaningRobots implements ICleaningRobots {
 
     public int buildDistrict() {
         return CleaningRobots.getInstance()
-                      .getDistricts()
-                      .stream()
-                      .reduce(0L, (count, n) -> count + 1, Long::min)
-                      .intValue() % 4;
+                             .getDistricts()
+                             .stream()
+                             .reduce(0L, (count, n) -> count + 1, Long::min)
+                             .intValue() % 4;
     }
 
     public List<Integer> getDistricts() {
