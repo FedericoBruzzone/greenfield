@@ -1,6 +1,8 @@
 package robot;
 
 import util.ConfigurationHandler;
+import util.MqttClientFactory;
+import util.MqttClientHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +15,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient; 
 
 import common.response.IResponse;
 import common.response.RobotAddResponse;
@@ -97,10 +100,20 @@ public class CleaningRobot implements ICleaningRobot {
             cleaningRobot.registerToAdministratorServer();
             
             //TODO hello to other robots
-                        
+            
+            MqttAsyncClient client = MqttClientFactory.createMqttClient();
+            MqttClientHandler mqttClientHandler = new MqttClientHandler(client); 
+
+
             int choice;
             while(true) { 
                 printMenu();
+                
+
+                String payload = String.valueOf(0 + (Math.random() * 10)); // create a random number between 0 and 10
+                System.out.println(" Publishing message: " + payload + " ...");
+                mqttClientHandler.publishMessage(payload, "0");
+                System.out.println(" Message published");
 
                 BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
                 // try {

@@ -42,4 +42,8 @@ public final class ConfigurationHandler {
     public String getEndpointBroker() {
         return properties.getProperty("endpointBroker");
     }
+
+    public String getMqttTopic() {
+        return properties.getProperty("mqttTopic");
+    }
 }
