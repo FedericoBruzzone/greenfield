@@ -3,6 +3,10 @@ package robot;
 import util.ConfigurationHandler;
 import util.MqttClientFactory;
 import util.MqttClientHandler;
+import common.response.IResponse;
+import common.response.RobotAddResponse;
+import robot.simulator.SlidingWindow;
+import robot.simulator.PM10Simulator;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,17 +21,17 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient; 
 
-import common.response.IResponse;
-import common.response.RobotAddResponse;
 
 public class CleaningRobot implements ICleaningRobot {
     private int id;
     private int district; 
     private String administratorServerURI;
     private List<CleaningRobotInfo> activeCleaningRobot;
-
     private AdministratorServerHandler administratorServerHandler;
     private Client client;
+    private SlidingWindow slidingWindow;
+    private ConfigurationHandler configurationHandler;
+    private PM10Simulator pm10Simulator;
 
     public CleaningRobot() {}
 
@@ -35,10 +39,16 @@ public class CleaningRobot implements ICleaningRobot {
         this.id = id;
         this.district = -1;
         this.activeCleaningRobot = null;
-        this.administratorServerURI = configureAdministratorServerURI(); 
+        this.configurationHandler = ConfigurationHandler.getInstance();
+        this.administratorServerURI = configureAdministratorServerURI(configurationHandler); 
         this.client = Client.create();
         this.administratorServerHandler = new AdministratorServerHandler(this.client, this.administratorServerURI);
         this.activeCleaningRobot = null;
+        this.slidingWindow = new SlidingWindow(
+                Integer.valueOf(this.configurationHandler.getSlidingWindowSize()),
+                Integer.valueOf(this.configurationHandler.getSlidingWindowOverlap())
+                );
+        this.pm10Simulator = new PM10Simulator(this.slidingWindow);
     }
 
     public int getID() {
@@ -52,9 +62,12 @@ public class CleaningRobot implements ICleaningRobot {
     public int getDistrict() {
         return this.district;
     }
-    
-    private String configureAdministratorServerURI() {
-        ConfigurationHandler configurationHandler = ConfigurationHandler.getInstance();
+   
+    public void startPm10Simulator() {
+        this.pm10Simulator.start();
+    }
+
+    private String configureAdministratorServerURI(ConfigurationHandler configurationHandler) {
         return configurationHandler.getEndpointAdministratorServer();
     }
 
@@ -103,7 +116,8 @@ public class CleaningRobot implements ICleaningRobot {
             
             MqttAsyncClient client = MqttClientFactory.createMqttClient();
             MqttClientHandler mqttClientHandler = new MqttClientHandler(client); 
-
+           
+            cleaningRobot.startPm10Simulator();
 
             int choice;
             while(true) { 

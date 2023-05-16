@@ -46,4 +46,12 @@ public final class ConfigurationHandler {
     public String getMqttTopic() {
         return properties.getProperty("mqttTopic");
     }
+
+    public String getSlidingWindowSize() {
+        return properties.getProperty("slidingWindowSize");
+    }
+    
+    public String getSlidingWindowOverlap() {
+        return properties.getProperty("slidingWindowOverlap");
+    }
 }

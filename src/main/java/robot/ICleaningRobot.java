@@ -6,6 +6,7 @@ public interface ICleaningRobot {
     public int getID();
     public String getServerURI();
     public int getDistrict();
+    public void startPm10Simulator();
     public void registerToAdministratorServer(); 
     public void removeFromAdministratorServer(); 
     public void setAdministratorServerHandler(Client client, String serverURI);
