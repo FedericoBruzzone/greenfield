@@ -7,6 +7,7 @@ import common.response.IResponse;
 import common.response.RobotAddResponse;
 import robot.simulator.SlidingWindow;
 import robot.simulator.PM10Simulator;
+import robot.thread.ComputeAverageThread;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class CleaningRobot implements ICleaningRobot {
     private SlidingWindow slidingWindow;
     private ConfigurationHandler configurationHandler;
     private PM10Simulator pm10Simulator;
-
+    private ComputeAverageThread computeAverageThread;
     public CleaningRobot() {}
 
     public CleaningRobot(int id) {
@@ -43,12 +44,12 @@ public class CleaningRobot implements ICleaningRobot {
         this.administratorServerURI = configureAdministratorServerURI(configurationHandler); 
         this.client = Client.create();
         this.administratorServerHandler = new AdministratorServerHandler(this.client, this.administratorServerURI);
-        this.activeCleaningRobot = null;
         this.slidingWindow = new SlidingWindow(
                 Integer.valueOf(this.configurationHandler.getSlidingWindowSize()),
                 Integer.valueOf(this.configurationHandler.getSlidingWindowOverlap())
                 );
         this.pm10Simulator = new PM10Simulator(this.slidingWindow);
+        this.computeAverageThread = new ComputeAverageThread(this.slidingWindow);
     }
 
     public int getID() {
@@ -65,6 +66,10 @@ public class CleaningRobot implements ICleaningRobot {
    
     public void startPm10Simulator() {
         this.pm10Simulator.start();
+    }
+    
+    public void startComputeAverageThread() {
+        this.computeAverageThread.start();
     }
 
     private String configureAdministratorServerURI(ConfigurationHandler configurationHandler) {
@@ -114,20 +119,21 @@ public class CleaningRobot implements ICleaningRobot {
             
             //TODO hello to other robots
             
-            MqttAsyncClient client = MqttClientFactory.createMqttClient();
-            MqttClientHandler mqttClientHandler = new MqttClientHandler(client); 
+            // MqttAsyncClient client = MqttClientFactory.createMqttClient();
+            // MqttClientHandler mqttClientHandler = new MqttClientHandler(client); 
            
             cleaningRobot.startPm10Simulator();
+            cleaningRobot.startComputeAverageThread();
 
             int choice;
             while(true) { 
                 printMenu();
                 
 
-                String payload = String.valueOf(0 + (Math.random() * 10)); // create a random number between 0 and 10
-                System.out.println(" Publishing message: " + payload + " ...");
-                mqttClientHandler.publishMessage(payload, "0");
-                System.out.println(" Message published");
+                // String payload = String.valueOf(0 + (Math.random() * 10)); // create a random number between 0 and 10
+                // System.out.println(" Publishing message: " + payload + " ...");
+                // mqttClientHandler.publishMessage(payload, "0");
+                // System.out.println(" Message published");
 
                 BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
                 // try {

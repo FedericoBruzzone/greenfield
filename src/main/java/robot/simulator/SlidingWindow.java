@@ -25,7 +25,7 @@ public class SlidingWindow implements Buffer {
         System.out.println("Adding measurement: " + m);
         this.queue.add(m);
         if(this.queue.size() >= this.size) {
-            System.out.println("Notifying");
+            // System.out.println("Notifying");
             this.notify();
         }
     }
@@ -41,7 +41,7 @@ public class SlidingWindow implements Buffer {
         ArrayDeque<Measurement> queueClone = this.queue.stream()
                                                        .limit(this.size)
                                                        .collect(Collectors.toCollection(ArrayDeque::new));
-        System.out.println(queueClone);
+        // System.out.println(queueClone);
 
         this.queue.stream()
                   .limit(this.overlap)
@@ -51,11 +51,4 @@ public class SlidingWindow implements Buffer {
         return new ArrayList<Measurement>(queueClone);
     }
 
-    // TODO: not here this method
-    public double mean(List<Measurement> measurements) {
-        return measurements.stream()
-                           .map(m -> m.getValue())
-                           .reduce((a, b) -> a + b)
-                           .orElse(0.0d) / measurements.size();
-    }
 }

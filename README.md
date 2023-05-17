@@ -76,5 +76,3 @@ with `compileJava.ajc.options.compilerArgs=["-sourceroots", sourceSets.main.java
 
 - `gradle build` or `./gradlew build`
 
-
-
