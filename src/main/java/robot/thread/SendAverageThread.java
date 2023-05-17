@@ -2,6 +2,7 @@ package robot.thread;
 
 import robot.thread.MeasurementStream;
 import util.MqttClientHandler;
+import com.google.gson.Gson;
 
 import java.lang.Thread;
 
@@ -20,9 +21,17 @@ public class SendAverageThread extends Thread {
 
     public void run() {
         // every 15 second getAndClean from measurementStream and publish it to the correct topic 
-        String payload = String.valueOf(0 + (Math.random() * 10)); // create a random number between 0 and 10
-        System.out.println(" Publishing message: " + payload + " ...");
-        mqttClientHandler.publishMessage(payload, "0");
-        System.out.println(" Message published");
+        Gson gson = new Gson();
+
+        while (true) {
+            try {
+                Thread.sleep(15000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            String measurementStreamJson = gson.toJson(measurementStream.getAndClean()); 
+            System.out.println("[SendAverageThread] send " + measurementStreamJson + " to topic " + district);
+            mqttClientHandler.publishMessage(measurementStreamJson, String.valueOf(district));
+        }
     }
 }

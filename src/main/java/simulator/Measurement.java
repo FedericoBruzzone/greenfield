@@ -1,4 +1,4 @@
-package robot.simulator;
+package simulator;
 
 public class Measurement implements Comparable<Measurement> {
 

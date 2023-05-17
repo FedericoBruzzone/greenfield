@@ -1,4 +1,4 @@
-package robot.simulator;
+package simulator;
 
 import java.util.List;
 

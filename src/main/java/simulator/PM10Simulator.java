@@ -1,4 +1,4 @@
-package robot.simulator;
+package simulator;
 
 public class PM10Simulator extends Simulator {
 

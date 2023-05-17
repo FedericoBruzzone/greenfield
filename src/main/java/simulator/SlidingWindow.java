@@ -1,6 +1,4 @@
-package robot.simulator;
-
-import robot.simulator.Measurement;
+package simulator;
 
 import java.util.List;
 import java.util.Deque;
@@ -22,7 +20,7 @@ public class SlidingWindow implements Buffer {
     }
     
     public synchronized void addMeasurement(Measurement m) {
-        System.out.println("Adding measurement: " + m);
+        System.out.println("[SlidingWindow] addMeasurement: " + m);
         this.queue.add(m);
         if(this.queue.size() >= this.size) {
             // System.out.println("Notifying");
@@ -31,6 +29,7 @@ public class SlidingWindow implements Buffer {
     }
     
     public synchronized List<Measurement> readAllAndClean() {
+        System.out.println("[SlidingWindow] readAllAndClean");
         while (this.queue.size() < this.size) {
             try {
                 this.wait();

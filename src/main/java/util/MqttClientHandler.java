@@ -10,6 +10,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+
 public class MqttClientHandler {
     private final MqttAsyncClient client;
     private final ConfigurationHandler configurationHandler;
@@ -18,7 +19,7 @@ public class MqttClientHandler {
         this.client = client;
         checkConnection();
         this.configurationHandler = ConfigurationHandler.getInstance();
-        System.out.println(configurationHandler.getMqttTopic());
+        // System.out.println(configurationHandler.getMqttTopic());
     }
 
     private void checkConnection() {
@@ -31,7 +32,16 @@ public class MqttClientHandler {
             }
         }
     } 
-   
+  
+    public void disconnect() {
+        try {
+            this.client.disconnect().waitForCompletion();
+        } catch (MqttException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
     public void subscribeToDistrict(String district) {
         this.client.setCallback(new MqttCallback() {
             @Override
@@ -86,5 +96,4 @@ public class MqttClientHandler {
             throw new RuntimeException(e);
         }
     }
-
 }

@@ -5,8 +5,8 @@ import util.MqttClientFactory;
 import util.MqttClientHandler;
 import common.response.IResponse;
 import common.response.RobotAddResponse;
-import robot.simulator.SlidingWindow;
-import robot.simulator.PM10Simulator;
+import simulator.SlidingWindow;
+import simulator.PM10Simulator;
 import robot.thread.ComputeAverageThread;
 import robot.thread.SendAverageThread;
 import robot.thread.MeasurementStream; 
@@ -57,11 +57,7 @@ public class CleaningRobot implements ICleaningRobot {
                 );
         this.mqttAsyncClient = MqttClientFactory.createMqttClient();
         this.mqttClientHandler = new MqttClientHandler(mqttAsyncClient);
-
         this.measurementStream = new MeasurementStream();
-        this.pm10Simulator = new PM10Simulator(this.slidingWindow);
-        this.computeAverageThread = new ComputeAverageThread(this.slidingWindow, this.measurementStream);
-        this.sendAverageThread = new SendAverageThread(this.measurementStream, this.mqttClientHandler, this.getDistrict());
     }
 
     public int getID() {
@@ -75,7 +71,19 @@ public class CleaningRobot implements ICleaningRobot {
     public int getDistrict() {
         return this.district;
     }
-   
+    
+    public void createPm10Simulator() {
+        this.pm10Simulator = new PM10Simulator(this.slidingWindow);
+    }
+    
+    public void createComputeAverageThread() {
+        this.computeAverageThread = new ComputeAverageThread(this.slidingWindow, this.measurementStream);
+    }
+
+    public void createSendAverageThread() {
+        this.sendAverageThread = new SendAverageThread(this.measurementStream, this.mqttClientHandler, this.getDistrict());
+    } 
+
     public void startPm10Simulator() {
         this.pm10Simulator.start();
     }
@@ -86,6 +94,22 @@ public class CleaningRobot implements ICleaningRobot {
 
     public void startSendAverageThread() {
         this.sendAverageThread.start();
+    }
+    
+    public void stopPm10Simulator() {
+        this.pm10Simulator.stop();
+    }
+    
+    public void stopComputeAverageThread() {
+        this.computeAverageThread.stop();
+    }
+
+    public void stopSendAverageThread() {
+        this.sendAverageThread.stop();
+    }
+   
+    public void disconnectMqttClient() {
+        this.mqttClientHandler.disconnect();
     }
 
     private String configureAdministratorServerURI(ConfigurationHandler configurationHandler) {
@@ -111,6 +135,9 @@ public class CleaningRobot implements ICleaningRobot {
                                                     .stream()
                                                     .map(cr -> new CleaningRobotInfo(cr.getId()))
                                                     .collect(Collectors.toList()) : null;
+        this.createPm10Simulator();
+        this.createComputeAverageThread();
+        this.createSendAverageThread();
     }
     
     public void removeFromAdministratorServer() {
@@ -137,9 +164,11 @@ public class CleaningRobot implements ICleaningRobot {
             
             // MqttAsyncClient client = MqttClientFactory.createMqttClient();
             // MqttClientHandler mqttClientHandler = new MqttClientHandler(client); 
-           
+            
+            
             cleaningRobot.startPm10Simulator();
             cleaningRobot.startComputeAverageThread();
+            cleaningRobot.startSendAverageThread();
 
             int choice;
             while(true) { 
@@ -165,8 +194,13 @@ public class CleaningRobot implements ICleaningRobot {
                             // TODO complete any operation at the mechanic 
                             // TODO send to the other robot?
                             cleaningRobot.removeFromAdministratorServer();
-                            // Close simulator threads
-                            // Close Mqtt broker
+                            
+                            cleaningRobot.stopPm10Simulator();
+                            cleaningRobot.stopComputeAverageThread();
+                            cleaningRobot.stopSendAverageThread();
+                            
+                            cleaningRobot.disconnectMqttClient();
+
                             System.exit(0);
                         case 2:
                             System.out.println("fix");

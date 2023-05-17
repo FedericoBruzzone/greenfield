@@ -1,7 +1,7 @@
 package robot.thread;
 
-import robot.simulator.SlidingWindow;
-import robot.simulator.Measurement;
+import simulator.SlidingWindow;
+import simulator.Measurement;
 import robot.thread.MeasurementStream;
 
 import java.lang.Thread;

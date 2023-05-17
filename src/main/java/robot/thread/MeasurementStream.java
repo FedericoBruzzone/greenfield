@@ -27,7 +27,9 @@ public class MeasurementStream {
         ArrayList<Double> measurementStreamClone = (measurementStream.size() > 0) ? 
                                         new ArrayList<>(measurementStream) :
                                         new ArrayList<>();
-        
+       
+        measurementStream.clear();
+
         return measurementStreamClone;
     }
 
