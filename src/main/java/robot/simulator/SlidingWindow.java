@@ -31,7 +31,7 @@ public class SlidingWindow implements Buffer {
     }
     
     public synchronized List<Measurement> readAllAndClean() {
-        if (this.queue.size() < this.size) {
+        while (this.queue.size() < this.size) {
             try {
                 this.wait();
             } catch (InterruptedException e) {

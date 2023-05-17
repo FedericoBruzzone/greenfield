@@ -2,16 +2,19 @@ package robot.thread;
 
 import robot.simulator.SlidingWindow;
 import robot.simulator.Measurement;
+import robot.thread.MeasurementStream;
 
 import java.lang.Thread;
 import java.util.List;
 
 public class ComputeAverageThread extends Thread {
     
-    private final SlidingWindow slidingWindow;
+    private SlidingWindow slidingWindow;
+    private MeasurementStream measurementStream;
 
-    public ComputeAverageThread(SlidingWindow slidingWindow) {
+    public ComputeAverageThread(SlidingWindow slidingWindow, MeasurementStream measurementStream) {
         this.slidingWindow = slidingWindow;
+        this.measurementStream = measurementStream;
     }
 
     public double mean(List<Measurement> measurements) {
@@ -25,7 +28,8 @@ public class ComputeAverageThread extends Thread {
         while (true) {
             List<Measurement> measurements = this.slidingWindow.readAllAndClean();
             double mean = this.mean(measurements);
-            System.out.println("Mean: " + mean);
+            // System.out.println("Mean: " + mean);
+            measurementStream.add(mean);
         }
     }
 }

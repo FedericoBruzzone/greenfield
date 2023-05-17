@@ -8,6 +8,8 @@ import common.response.RobotAddResponse;
 import robot.simulator.SlidingWindow;
 import robot.simulator.PM10Simulator;
 import robot.thread.ComputeAverageThread;
+import robot.thread.SendAverageThread;
+import robot.thread.MeasurementStream; 
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,6 +36,11 @@ public class CleaningRobot implements ICleaningRobot {
     private ConfigurationHandler configurationHandler;
     private PM10Simulator pm10Simulator;
     private ComputeAverageThread computeAverageThread;
+    private SendAverageThread sendAverageThread;
+    private MqttAsyncClient mqttAsyncClient; 
+    private MqttClientHandler mqttClientHandler;
+    private MeasurementStream measurementStream; 
+
     public CleaningRobot() {}
 
     public CleaningRobot(int id) {
@@ -48,8 +55,13 @@ public class CleaningRobot implements ICleaningRobot {
                 Integer.valueOf(this.configurationHandler.getSlidingWindowSize()),
                 Integer.valueOf(this.configurationHandler.getSlidingWindowOverlap())
                 );
+        this.mqttAsyncClient = MqttClientFactory.createMqttClient();
+        this.mqttClientHandler = new MqttClientHandler(mqttAsyncClient);
+
+        this.measurementStream = new MeasurementStream();
         this.pm10Simulator = new PM10Simulator(this.slidingWindow);
-        this.computeAverageThread = new ComputeAverageThread(this.slidingWindow);
+        this.computeAverageThread = new ComputeAverageThread(this.slidingWindow, this.measurementStream);
+        this.sendAverageThread = new SendAverageThread(this.measurementStream, this.mqttClientHandler, this.getDistrict());
     }
 
     public int getID() {
@@ -70,6 +82,10 @@ public class CleaningRobot implements ICleaningRobot {
     
     public void startComputeAverageThread() {
         this.computeAverageThread.start();
+    }
+
+    public void startSendAverageThread() {
+        this.sendAverageThread.start();
     }
 
     private String configureAdministratorServerURI(ConfigurationHandler configurationHandler) {
