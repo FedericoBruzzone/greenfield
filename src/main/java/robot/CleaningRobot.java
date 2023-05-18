@@ -173,7 +173,6 @@ public class CleaningRobot implements ICleaningRobot {
             int choice;
             while(true) { 
                 printMenu();
-                
 
                 // String payload = String.valueOf(0 + (Math.random() * 10)); // create a random number between 0 and 10
                 // System.out.println(" Publishing message: " + payload + " ...");
@@ -181,7 +180,7 @@ public class CleaningRobot implements ICleaningRobot {
                 // System.out.println(" Message published");
 
                 BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-                // try {
+                try {
                     choice = Integer.parseInt(inFromUser.readLine());
                     switch (choice) {
                         case 0:
@@ -210,9 +209,9 @@ public class CleaningRobot implements ICleaningRobot {
                             System.out.println("This choice is not available.");
                             break;
                     }
-                // } catch (IOException e) {
-                //     e.printStackTrace();
-                // }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

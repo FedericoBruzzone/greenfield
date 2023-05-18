@@ -12,24 +12,40 @@ import java.io.IOException;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 
 public final class AdministratorServer implements IAdministratorServer {
-    private static void mqttInitializer() {
-        MqttAsyncClient client = MqttClientFactory.createMqttClient();
-        MqttClientHandler mqttClientHandler = new MqttClientHandler(client); 
-        mqttClientHandler.subscribeToDistrict("0");
-        mqttClientHandler.subscribeToDistrict("1");
-        mqttClientHandler.subscribeToDistrict("2");
-        mqttClientHandler.subscribeToDistrict("3");
+    private ConfigurationHandler configurationHandler;
+    private String serverURI;
+    private HttpServer httpServer;
+    private MqttAsyncClient client;
+    private MqttClientHandler mqttClientHandler;
+
+    public AdministratorServer() {
+        this.configurationHandler = ConfigurationHandler.getInstance();
+        this.serverURI = configurationHandler.getEndpointAdministratorServer();
+        this.createHttpServer(); 
+        this.client = MqttClientFactory.createMqttClient();
+        this.mqttClientHandler = new MqttClientHandler(client);
+    }
+   
+    public void createHttpServer() {
+        try {
+            this.httpServer = HttpServerFactory.create(serverURI + "/");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public static void main(String[] args) {
-        ConfigurationHandler configurationHandler = ConfigurationHandler.getInstance();
-        String serverURI = configurationHandler.getEndpointAdministratorServer();
+    private void subscribeToDistricts() {
+        this.mqttClientHandler.subscribeToDistrict("0");
+        this.mqttClientHandler.subscribeToDistrict("1");
+        this.mqttClientHandler.subscribeToDistrict("2");
+        this.mqttClientHandler.subscribeToDistrict("3");
+    }
+    
+    public void startHttpServer() {
         try {
-            final HttpServer httpServer = HttpServerFactory.create(serverURI + "/");
-
             httpServer.start();
 
-            mqttInitializer();
+            this.subscribeToDistricts();
 
             System.out.println("Server running!");
             System.out.println("Server started on: " + serverURI);
@@ -43,4 +59,10 @@ public final class AdministratorServer implements IAdministratorServer {
             e.printStackTrace();
         }
     }
+
+    public static void main(String[] args) {
+        AdministratorServer administratorServer = new AdministratorServer();
+        administratorServer.startHttpServer(); 
+    }
+
 }

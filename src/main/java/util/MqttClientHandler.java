@@ -54,6 +54,9 @@ public class MqttClientHandler {
                             "\n\tTopic:   " + topic +
                             "\n\tMessage: " + receivedMessage +
                             "\n\tQoS:     " + message.getQos() + "\n");
+                    
+                    // convert the message from json to ArrayList
+                    // and add it to the Queue Static
 
                     // System.out.println("\n ***  Press a random key to exit *** \n");
             }
