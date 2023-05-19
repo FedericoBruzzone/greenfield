@@ -1,7 +1,7 @@
 package util;
 
 import util.ConfigurationHandler;
-import administrator.server.beans.robot.CleaningRobots;
+import administrator.server.beans.robot.CommonCleaningRobots;
 
 import java.sql.Timestamp;
 import java.util.ArrayList; 
@@ -66,7 +66,7 @@ public class MqttClientHandler {
                 // put in the HashMap<id of robot, stram> 
                 ArrayList<Double> measurementList = measurementStream.getMeasurementList(); 
                 int id = measurementStream.getId();
-                CleaningRobots.getInstance().addMeasurementWithId(id, measurementList);
+                CommonCleaningRobots.getInstance().addMeasurementWithId(id, measurementList);
 
                 // System.out.println("\n ***  Press a random key to exit *** \n");
             }

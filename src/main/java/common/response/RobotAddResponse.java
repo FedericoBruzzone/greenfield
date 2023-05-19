@@ -5,10 +5,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import administrator.server.beans.robot.CleaningRobots;
-import administrator.server.beans.robot.ICleaningRobots;
+import administrator.server.beans.robot.CommonCleaningRobots;
+import administrator.server.beans.robot.ICommonCleaningRobots;
 import common.CommonCleaningRobot;
-import common.CommonICleaningRobot;
+import common.ICommonCleaningRobot;
 
 import java.util.List;
 import java.util.ArrayList;

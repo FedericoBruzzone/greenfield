@@ -1,11 +1,11 @@
 package administrator.server.services;
 
 import common.CommonCleaningRobot;
-import administrator.server.beans.robot.CleaningRobots;
-import common.CommonICleaningRobot;
+import administrator.server.beans.robot.CommonCleaningRobots;
+import common.ICommonCleaningRobot;
 import common.response.IResponse;
 import common.response.RobotAddResponse;
-import administrator.server.beans.robot.ICleaningRobots;
+import administrator.server.beans.robot.ICommonCleaningRobots;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class RobotCleaningService {
     @GET
     @Produces({"application/json", "application/xml"})
     public Response getCleaningRobotsList(){
-        return Response.ok(CleaningRobots.getInstance()).build();
+        return Response.ok(CommonCleaningRobots.getInstance()).build();
     }
 
     @Path("add")
@@ -27,13 +27,13 @@ public class RobotCleaningService {
     @Consumes({"application/json", "application/xml"})
     @Produces({"application/json", "application/xml"})
     public Response addCleaningRobot(CommonCleaningRobot cleaningRobot){
-        CommonCleaningRobot newCleaningRobot = CleaningRobots.getInstance().add(cleaningRobot);
+        CommonCleaningRobot newCleaningRobot = CommonCleaningRobots.getInstance().add(cleaningRobot);
         if (newCleaningRobot == null) {
             return Response.status(Response.Status.CONFLICT).build();
         }
-        RobotAddResponse robotAddResponse = new RobotAddResponse(CleaningRobots.getInstance().getCleaningRobotsWithout(cleaningRobot), 
+        RobotAddResponse robotAddResponse = new RobotAddResponse(CommonCleaningRobots.getInstance().getCleaningRobotsWithout(cleaningRobot), 
                                                                  newCleaningRobot.getDistrict());
-        System.out.println("/robot/add " + CleaningRobots.getInstance().getCleaningRobots());
+        System.out.println("/robot/add " + CommonCleaningRobots.getInstance().getCleaningRobots());
         return Response.ok(robotAddResponse).build();
     }
     
@@ -41,8 +41,8 @@ public class RobotCleaningService {
     @DELETE
     @Consumes({"application/json", "application/xml"})
     public Response removeCleaningRobot(CommonCleaningRobot cleaningRobot){
-        if (CleaningRobots.getInstance().remove(cleaningRobot)) {
-            System.out.println("/robot/remove " + CleaningRobots.getInstance().getCleaningRobots());
+        if (CommonCleaningRobots.getInstance().remove(cleaningRobot)) {
+            System.out.println("/robot/remove " + CommonCleaningRobots.getInstance().getCleaningRobots());
             return Response.ok().build(); 
         }
         else {

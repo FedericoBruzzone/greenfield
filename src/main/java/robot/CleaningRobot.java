@@ -27,6 +27,8 @@ import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 
 public class CleaningRobot implements ICleaningRobot {
     private int id;
+    private String host;
+    private String port;
     private int district; 
     private String administratorServerURI;
     private List<CleaningRobotInfo> activeCleaningRobot;
@@ -44,10 +46,12 @@ public class CleaningRobot implements ICleaningRobot {
     public CleaningRobot() {}
 
     public CleaningRobot(int id) {
+        this.configurationHandler = ConfigurationHandler.getInstance();
         this.id = id;
+        this.host = this.configurationHandler.getRobotHost(); 
+        this.port = String.valueOf(10000 + this.id);
         this.district = -1;
         this.activeCleaningRobot = null;
-        this.configurationHandler = ConfigurationHandler.getInstance();
         this.administratorServerURI = configureAdministratorServerURI(configurationHandler); 
         this.client = Client.create();
         this.administratorServerHandler = new AdministratorServerHandler(this.client, this.administratorServerURI);
@@ -60,8 +64,16 @@ public class CleaningRobot implements ICleaningRobot {
         this.measurementStream = new MeasurementStream();
     }
 
-    public int getID() {
+    public int getId() {
         return this.id;
+    }
+    
+    public String getHost() {
+        return this.host;
+    }
+    
+    public String getPort() {
+        return this.port;
     }
     
     public String getServerURI() {
@@ -85,7 +97,7 @@ public class CleaningRobot implements ICleaningRobot {
         this.sendAverageThread = new SendAverageThread(this.measurementStream, 
                                                        this.mqttClientHandler, 
                                                        this.getDistrict(), 
-                                                       this.getID());
+                                                       this.getId());
     } 
 
     public void startPm10Simulator() {
@@ -137,7 +149,9 @@ public class CleaningRobot implements ICleaningRobot {
         this.activeCleaningRobot = robotAddResponse.listActiveCleaningRobot != null ? 
                                     robotAddResponse.listActiveCleaningRobot
                                                     .stream()
-                                                    .map(cr -> new CleaningRobotInfo(cr.getId()))
+                                                    .map(cr -> new CleaningRobotInfo(cr.getId(),
+                                                                                     cr.getHost(),
+                                                                                     cr.getPort()))
                                                     .collect(Collectors.toList()) : null;
         this.createPm10Simulator();
         this.createComputeAverageThread();

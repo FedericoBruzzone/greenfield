@@ -34,7 +34,11 @@ public final class ConfigurationHandler {
         }
         return instance;
     }
-    
+   
+    public String getRobotHost() {
+        return properties.getProperty("robotHost");
+    }
+
     public String getEndpointAdministratorServer() {
         return properties.getProperty("endpointAdministratorServer");
     }

@@ -13,27 +13,27 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.api.SystemParameter;
 
-import common.CommonICleaningRobot;
+import common.ICommonCleaningRobot;
 import common.CommonCleaningRobot;
 
 @XmlRootElement
 @XmlAccessorType(value = XmlAccessType.FIELD)
-public final class CleaningRobots implements ICleaningRobots {
+public final class CommonCleaningRobots implements ICommonCleaningRobots {
     
-    private static CleaningRobots instance;
+    private static CommonCleaningRobots instance;
     private List<CommonCleaningRobot> cleaningRobotsList;
     private HashMap<Integer, ArrayList<Double>> measurementsMap;
 
-    private CleaningRobots() {
+    private CommonCleaningRobots() {
         cleaningRobotsList = new ArrayList<CommonCleaningRobot>();
         measurementsMap = new HashMap<Integer, ArrayList<Double>>();
     }
 
-    public static CleaningRobots getInstance() {
+    public static CommonCleaningRobots getInstance() {
        if (instance == null) {
-            synchronized (CleaningRobots.class) {
+            synchronized (CommonCleaningRobots.class) {
                 if (instance == null) {
-                    instance = new CleaningRobots();
+                    instance = new CommonCleaningRobots();
                 }
             }
         }
@@ -74,11 +74,11 @@ public final class CleaningRobots implements ICleaningRobots {
 
 
     public int buildDistrict() {
-        return CleaningRobots.getInstance()
-                             .getDistricts()
-                             .stream()
-                             .reduce(0L, (count, n) -> count + 1, Long::min)
-                             .intValue() % 4;
+        return CommonCleaningRobots.getInstance()
+                                   .getDistricts()
+                                   .stream()
+                                   .reduce(0L, (count, n) -> count + 1, Long::min)
+                                   .intValue() % 4;
     }
 
     public List<Integer> getDistricts() {

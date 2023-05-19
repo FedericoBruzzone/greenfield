@@ -3,10 +3,10 @@ package administrator.server.beans.robot;
 import java.util.List;
 import java.util.ArrayList;
 
-import common.CommonICleaningRobot;
+import common.ICommonCleaningRobot;
 import common.CommonCleaningRobot;
 
-public interface ICleaningRobots {
+public interface ICommonCleaningRobots {
     public List<CommonCleaningRobot> getCleaningRobots();
     public List<CommonCleaningRobot> getCleaningRobotsWithout(CommonCleaningRobot cleaningRobot);
     public CommonCleaningRobot add(CommonCleaningRobot cleaningRobot);

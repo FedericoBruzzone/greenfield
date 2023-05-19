@@ -3,7 +3,9 @@ package robot;
 import com.sun.jersey.api.client.Client;
 
 public interface ICleaningRobot {
-    public int getID();
+    public int getId();
+    public String getHost();
+    public String getPort();
     public String getServerURI();
     public int getDistrict();
     public void createPm10Simulator();

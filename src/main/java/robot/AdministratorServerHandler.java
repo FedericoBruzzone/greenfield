@@ -16,7 +16,9 @@ public class AdministratorServerHandler {
     }
 
     public ClientResponse registerCleaningRobot(ICleaningRobot cleaningRobot) {
-        CommonCleaningRobot commonCleaningRobot = new CommonCleaningRobot(cleaningRobot.getID());
+        CommonCleaningRobot commonCleaningRobot = new CommonCleaningRobot(cleaningRobot.getId(), 
+                                                                          cleaningRobot.getHost(), 
+                                                                          cleaningRobot.getPort());
         ClientResponse clientResponse = RestHandler.postRequest(client, administratorServerURI+"/robot/add", commonCleaningRobot);
         if (clientResponse.getStatus() != 200) {
             throw new RuntimeException("Failed [" +clientResponse.getStatus()+ "]: There is another Cleaning Robot with this ID ");
@@ -25,7 +27,9 @@ public class AdministratorServerHandler {
     }
 
     public ClientResponse removeCleaningRobot(ICleaningRobot cleaningRobot) {
-        CommonCleaningRobot commonCleaningRobot = new CommonCleaningRobot(cleaningRobot.getID());
+        CommonCleaningRobot commonCleaningRobot = new CommonCleaningRobot(cleaningRobot.getId(), 
+                                                                          cleaningRobot.getHost(), 
+                                                                          cleaningRobot.getPort());        
         ClientResponse clientResponse = RestHandler.deleteRequest(client, administratorServerURI+"/robot/remove", commonCleaningRobot);
         if (clientResponse.getStatus() != 200) {
             throw new RuntimeException("Failed [" +clientResponse.getStatus()+ "]: There is no Cleaning Robot with this ID ");
