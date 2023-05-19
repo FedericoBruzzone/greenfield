@@ -1,8 +1,12 @@
 package util;
 
 import util.ConfigurationHandler;
+import administrator.server.beans.robot.CleaningRobots;
 
 import java.sql.Timestamp;
+import java.util.ArrayList; 
+
+import com.google.gson.Gson;
 
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -43,22 +47,28 @@ public class MqttClientHandler {
     }
 
     public void subscribeToDistrict(String district) {
+        Gson gson = new Gson();
         this.client.setCallback(new MqttCallback() {
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
                 // System.out.println("Message arrived: " + new String(message.getPayload()));
                 String time = new Timestamp(System.currentTimeMillis()).toString();
-                    String receivedMessage = new String(message.getPayload());
-                    System.out.println(client.getClientId() +" Received a Message! - Callback - Thread PID: " + Thread.currentThread().getId() +
+                String receivedMessage = new String(message.getPayload());
+                System.out.println(client.getClientId() +" Received a Message! - Callback - Thread PID: " + Thread.currentThread().getId() +
                             "\n\tTime:    " + time +
                             "\n\tTopic:   " + topic +
                             "\n\tMessage: " + receivedMessage +
                             "\n\tQoS:     " + message.getQos() + "\n");
-                    
-                    // convert the message from json to ArrayList
-                    // and add it to the Queue Static
+                   
+                MqttMessageAverageId measurementStream = gson.fromJson(receivedMessage, MqttMessageAverageId.class);
+                // System.out.println(measurementStream);
 
-                    // System.out.println("\n ***  Press a random key to exit *** \n");
+                // put in the HashMap<id of robot, stram> 
+                ArrayList<Double> measurementList = measurementStream.getMeasurementList(); 
+                int id = measurementStream.getId();
+                CleaningRobots.getInstance().addMeasurementWithId(id, measurementList);
+
+                // System.out.println("\n ***  Press a random key to exit *** \n");
             }
 
             @Override

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.Collections;
+import java.util.HashMap;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -21,9 +22,11 @@ public final class CleaningRobots implements ICleaningRobots {
     
     private static CleaningRobots instance;
     private List<CommonCleaningRobot> cleaningRobotsList;
-    
+    private HashMap<Integer, ArrayList<Double>> measurementsMap;
+
     private CleaningRobots() {
         cleaningRobotsList = new ArrayList<CommonCleaningRobot>();
+        measurementsMap = new HashMap<Integer, ArrayList<Double>>();
     }
 
     public static CleaningRobots getInstance() {
@@ -93,5 +96,8 @@ public final class CleaningRobots implements ICleaningRobots {
     private boolean checkID(int ID) {
         return !cleaningRobotsList.stream().anyMatch(cleaningRobot -> cleaningRobot.getId() == ID);
     }
-
+    
+    public synchronized void addMeasurementWithId(int id, ArrayList<Double> measurements) {
+        measurementsMap.put(id, measurements);
+    }
 }

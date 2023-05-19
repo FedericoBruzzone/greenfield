@@ -77,11 +77,15 @@ public class CleaningRobot implements ICleaningRobot {
     }
     
     public void createComputeAverageThread() {
-        this.computeAverageThread = new ComputeAverageThread(this.slidingWindow, this.measurementStream);
+        this.computeAverageThread = new ComputeAverageThread(this.slidingWindow, 
+                                                             this.measurementStream);
     }
 
     public void createSendAverageThread() {
-        this.sendAverageThread = new SendAverageThread(this.measurementStream, this.mqttClientHandler, this.getDistrict());
+        this.sendAverageThread = new SendAverageThread(this.measurementStream, 
+                                                       this.mqttClientHandler, 
+                                                       this.getDistrict(), 
+                                                       this.getID());
     } 
 
     public void startPm10Simulator() {
