@@ -46,7 +46,7 @@ public class CommonCleaningRobot implements ICommonCleaningRobot {
     }
 
     public String toString() {
-        return "{\n" + 
+        return "\n{\n" + 
             "\t" + "\"id\":" + this.id + ",\n" +
             "\t" + "\"host\":" + this.host + ",\n" +
             "\t" + "\"port\":" + this.port + ",\n" +

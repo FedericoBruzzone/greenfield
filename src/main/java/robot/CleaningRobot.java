@@ -10,6 +10,8 @@ import simulator.PM10Simulator;
 import robot.thread.ComputeAverageThread;
 import robot.thread.SendAverageThread;
 import robot.thread.MeasurementStream; 
+import robot.grpc.GreetingServiceImpl;
+import robot.grpc.GreetingServiceClient;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,37 +26,53 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient; 
 
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
 
 public class CleaningRobot implements ICleaningRobot {
+    private ConfigurationHandler configurationHandler;
+
     private int id;
     private String host;
     private String port;
     private int district; 
-    private String administratorServerURI;
     private List<CleaningRobotInfo> activeCleaningRobot;
-    private AdministratorServerHandler administratorServerHandler;
+
     private Client client;
+    private String administratorServerURI;
+    private AdministratorServerHandler administratorServerHandler;
+
     private SlidingWindow slidingWindow;
-    private ConfigurationHandler configurationHandler;
-    private PM10Simulator pm10Simulator;
-    private ComputeAverageThread computeAverageThread;
-    private SendAverageThread sendAverageThread;
     private MqttAsyncClient mqttAsyncClient; 
     private MqttClientHandler mqttClientHandler;
     private MeasurementStream measurementStream; 
 
+    private PM10Simulator pm10Simulator;
+    private ComputeAverageThread computeAverageThread;
+    private SendAverageThread sendAverageThread;
+
+    private Server grpcServer;
+    
+
     public CleaningRobot() {}
 
     public CleaningRobot(int id) {
+        // ConfigurationHandler
         this.configurationHandler = ConfigurationHandler.getInstance();
+
+        // CleaningRobot
         this.id = id;
         this.host = this.configurationHandler.getRobotHost(); 
         this.port = String.valueOf(10000 + this.id);
         this.district = -1;
         this.activeCleaningRobot = null;
-        this.administratorServerURI = configureAdministratorServerURI(configurationHandler); 
+
+        // AdministratorServer
         this.client = Client.create();
+        this.administratorServerURI = configureAdministratorServerURI(configurationHandler); 
         this.administratorServerHandler = new AdministratorServerHandler(this.client, this.administratorServerURI);
+        
+        // MQTT
         this.slidingWindow = new SlidingWindow(
                 Integer.valueOf(this.configurationHandler.getSlidingWindowSize()),
                 Integer.valueOf(this.configurationHandler.getSlidingWindowOverlap())
@@ -62,6 +80,14 @@ public class CleaningRobot implements ICleaningRobot {
         this.mqttAsyncClient = MqttClientFactory.createMqttClient();
         this.mqttClientHandler = new MqttClientHandler(mqttAsyncClient);
         this.measurementStream = new MeasurementStream();
+
+        // GRPC
+        GreetingServiceClient greetingServiceClient = new GreetingServiceClient();
+        GreetingServiceImpl greetingServiceImpl = new GreetingServiceImpl(this);
+        grpcServer = ServerBuilder.forPort(Integer.valueOf(this.port))
+                                  .addService(greetingServiceImpl)
+                                  .build();
+
     }
 
     public int getId() {
@@ -123,7 +149,25 @@ public class CleaningRobot implements ICleaningRobot {
     public void stopSendAverageThread() {
         this.sendAverageThread.stop();
     }
-   
+    
+    public void createAllThreads() {
+        this.createPm10Simulator();
+        this.createComputeAverageThread();
+        this.createSendAverageThread();
+    }
+
+    public void startAllThreads() {
+        this.startPm10Simulator();
+        this.startComputeAverageThread();
+        this.startSendAverageThread();
+    }
+
+    public void stopAllThreads() {
+        this.stopPm10Simulator();
+        this.stopComputeAverageThread();
+        this.stopSendAverageThread();
+    }
+
     public void disconnectMqttClient() {
         this.mqttClientHandler.disconnect();
     }
@@ -145,6 +189,9 @@ public class CleaningRobot implements ICleaningRobot {
         RobotAddResponse robotAddResponse = clientResponse.getEntity(RobotAddResponse.class);
         // System.out.println("Response: " + robotAddResponse);        
         System.out.println("Response: " + clientResponse);        
+        if (clientResponse.getStatus() != 200) {
+            System.exit(0);
+        }
         this.district = robotAddResponse.district;
         this.activeCleaningRobot = robotAddResponse.listActiveCleaningRobot != null ? 
                                     robotAddResponse.listActiveCleaningRobot
@@ -153,14 +200,46 @@ public class CleaningRobot implements ICleaningRobot {
                                                                                      cr.getHost(),
                                                                                      cr.getPort()))
                                                     .collect(Collectors.toList()) : null;
-        this.createPm10Simulator();
-        this.createComputeAverageThread();
-        this.createSendAverageThread();
     }
     
     public void removeFromAdministratorServer() {
         ClientResponse clientResponse = administratorServerHandler.removeCleaningRobot(this);
         System.out.println("Response: " + clientResponse);
+    }
+
+    public void startGrpcServer() {
+        try {
+            grpcServer.start();
+            System.out.println("Server started!");
+            grpcServer.awaitTermination();
+        } catch (IOException e) { 
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void stopGrpcServer() {
+        grpcServer.shutdown();
+    }
+
+    public void sayGreeting() {
+        // TODO
+        fsdkjm
+    }
+
+    public void sayGreetingToAll() {
+        // TODO
+        fsd,kmh
+    }
+    
+    public void systemExit0() {
+        System.out.println("CleaningRobot " + this.getId() + " is going to exit");
+        this.removeFromAdministratorServer();
+        this.stopAllThreads();
+        this.disconnectMqttClient();
+        this.stopGrpcServer();
+        System.exit(0);
     }
 
     private static void printMenu() {
@@ -176,26 +255,17 @@ public class CleaningRobot implements ICleaningRobot {
         try {
             int id = Integer.parseInt(inFromUserId.readLine());  
             ICleaningRobot cleaningRobot = new CleaningRobot(id);
+
             cleaningRobot.registerToAdministratorServer();
-            
+            cleaningRobot.createAllThreads();
+            cleaningRobot.startAllThreads();
+            cleaningRobot.startGrpcServer();
             //TODO hello to other robots
             
-            // MqttAsyncClient client = MqttClientFactory.createMqttClient();
-            // MqttClientHandler mqttClientHandler = new MqttClientHandler(client); 
-            
-            
-            cleaningRobot.startPm10Simulator();
-            cleaningRobot.startComputeAverageThread();
-            cleaningRobot.startSendAverageThread();
 
             int choice;
             while(true) { 
                 printMenu();
-
-                // String payload = String.valueOf(0 + (Math.random() * 10)); // create a random number between 0 and 10
-                // System.out.println(" Publishing message: " + payload + " ...");
-                // mqttClientHandler.publishMessage(payload, "0");
-                // System.out.println(" Message published");
 
                 BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
                 try {
@@ -203,22 +273,12 @@ public class CleaningRobot implements ICleaningRobot {
                     switch (choice) {
                         case 0:
                             System.out.println("crash");
-                            // TODO send to the other robot?
-                            // cleaningRobot.removeFromAdministratorServer();
                             System.exit(1);
                         case 1:
                             System.out.println("quit");
                             // TODO complete any operation at the mechanic 
                             // TODO send to the other robot?
-                            cleaningRobot.removeFromAdministratorServer();
-                            
-                            cleaningRobot.stopPm10Simulator();
-                            cleaningRobot.stopComputeAverageThread();
-                            cleaningRobot.stopSendAverageThread();
-                            
-                            cleaningRobot.disconnectMqttClient();
-
-                            System.exit(0);
+                            cleaningRobot.systemExit0();
                         case 2:
                             System.out.println("fix");
                             // TODO
@@ -229,19 +289,14 @@ public class CleaningRobot implements ICleaningRobot {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    cleaningRobot.systemExit0();
+                    System.out.println("Bye bye");
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        } 
     }
-    // main
-    // instance of server (connect to server)
-    // chiedo di entrare
-    // prendo la risposta e setto il distretto per usarla come topic mqtt
-    // start all threads
-    //     accendi sensori
-    //     saluti gli altri (per aggiungerti alla loro lista)
-    //     connettiti a mqtt
 
 }

@@ -72,7 +72,6 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
         return null;
     }
 
-
     public int buildDistrict() {
         return CommonCleaningRobots.getInstance()
                                    .getDistricts()

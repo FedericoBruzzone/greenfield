@@ -20,7 +20,7 @@ public class SlidingWindow implements Buffer {
     }
     
     public synchronized void addMeasurement(Measurement m) {
-        System.out.println("[SlidingWindow] addMeasurement: " + m);
+        // System.out.println("[SlidingWindow] addMeasurement: " + m);
         this.queue.add(m);
         if(this.queue.size() >= this.size) {
             // System.out.println("Notifying");
@@ -29,7 +29,7 @@ public class SlidingWindow implements Buffer {
     }
     
     public synchronized List<Measurement> readAllAndClean() {
-        System.out.println("[SlidingWindow] readAllAndClean");
+        // System.out.println("[SlidingWindow] readAllAndClean");
         while (this.queue.size() < this.size) {
             try {
                 this.wait();
@@ -40,8 +40,6 @@ public class SlidingWindow implements Buffer {
         ArrayDeque<Measurement> queueClone = this.queue.stream()
                                                        .limit(this.size)
                                                        .collect(Collectors.toCollection(ArrayDeque::new));
-        // System.out.println(queueClone);
-
         this.queue.stream()
                   .limit(this.overlap)
                   .forEach(m -> this.queue.removeFirst());

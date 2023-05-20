@@ -28,7 +28,6 @@ public class ComputeAverageThread extends Thread {
         while (true) {
             List<Measurement> measurements = this.slidingWindow.readAllAndClean();
             double mean = this.mean(measurements);
-            // System.out.println("Mean: " + mean);
             measurementStream.add(mean);
         }
     }

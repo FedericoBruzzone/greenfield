@@ -33,7 +33,8 @@ public class RobotCleaningService {
         }
         RobotAddResponse robotAddResponse = new RobotAddResponse(CommonCleaningRobots.getInstance().getCleaningRobotsWithout(cleaningRobot), 
                                                                  newCleaningRobot.getDistrict());
-        System.out.println("/robot/add " + CommonCleaningRobots.getInstance().getCleaningRobots());
+        System.out.println("/robot/add " + CommonCleaningRobots.getInstance()
+                                                               .getCleaningRobots());
         return Response.ok(robotAddResponse).build();
     }
     

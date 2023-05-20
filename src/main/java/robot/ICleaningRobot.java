@@ -17,9 +17,17 @@ public interface ICleaningRobot {
     public void stopPm10Simulator();
     public void stopComputeAverageThread();
     public void stopSendAverageThread();
+    public void createAllThreads();
+    public void startAllThreads();
+    public void stopAllThreads();
     public void disconnectMqttClient();
+    public void startGrpcServer();
+    public void stopGrpcServer();
+    public void sayGreeting();
+    public void sayGreetingToAll();
     public void registerToAdministratorServer(); 
     public void removeFromAdministratorServer(); 
     public void setAdministratorServerHandler(Client client, String serverURI);
     public void setAdministratorServerHandler(AdministratorServerHandler administratorServerHandler);
+    public void systemExit0();
 }

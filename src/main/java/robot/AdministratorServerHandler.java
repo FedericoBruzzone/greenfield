@@ -20,9 +20,11 @@ public class AdministratorServerHandler {
                                                                           cleaningRobot.getHost(), 
                                                                           cleaningRobot.getPort());
         ClientResponse clientResponse = RestHandler.postRequest(client, administratorServerURI+"/robot/add", commonCleaningRobot);
-        if (clientResponse.getStatus() != 200) {
-            throw new RuntimeException("Failed [" +clientResponse.getStatus()+ "]: There is another Cleaning Robot with this ID ");
-        }
+        // if (clientResponse.getStatus() != 200) {
+        //     throw new RuntimeException("Failed [" +clientResponse.getStatus()+ "]: There is another Cleaning Robot with this ID ");
+        // } 
+        
+        
         return clientResponse;
     }
 
