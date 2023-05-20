@@ -63,7 +63,6 @@ public class MqttClientHandler {
                 MqttMessageAverageId measurementStream = gson.fromJson(receivedMessage, MqttMessageAverageId.class);
                 // System.out.println(measurementStream);
 
-                // put in the HashMap<id of robot, stram> 
                 ArrayList<Double> measurementList = measurementStream.getMeasurementList(); 
                 int id = measurementStream.getId();
                 CommonCleaningRobots.getInstance().addMeasurementWithId(id, measurementList);

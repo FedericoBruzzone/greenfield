@@ -87,7 +87,6 @@ public class CleaningRobot implements ICleaningRobot {
         grpcServer = ServerBuilder.forPort(Integer.valueOf(this.port))
                                   .addService(greetingServiceImpl)
                                   .build();
-
     }
 
     public int getId() {
