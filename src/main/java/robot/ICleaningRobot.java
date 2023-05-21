@@ -6,8 +6,14 @@ public interface ICleaningRobot {
     public int getId();
     public String getHost();
     public String getPort();
-    public String getServerURI();
     public int getDistrict();
+    public String getServerURI();
+    
+    public void registerToAdministratorServer(); 
+    public void removeFromAdministratorServer(); 
+    public void setAdministratorServerHandler(Client client, String serverURI);
+    public void setAdministratorServerHandler(AdministratorServerHandler administratorServerHandler);
+
     public void createPm10Simulator();
     public void createComputeAverageThread();
     public void createSendAverageThread();
@@ -21,13 +27,12 @@ public interface ICleaningRobot {
     public void startAllThreads();
     public void stopAllThreads();
     public void disconnectMqttClient();
+
     public void startGrpcServer();
     public void stopGrpcServer();
-    public void sayGreeting();
-    public void sayGreetingToAll();
-    public void registerToAdministratorServer(); 
-    public void removeFromAdministratorServer(); 
-    public void setAdministratorServerHandler(Client client, String serverURI);
-    public void setAdministratorServerHandler(AdministratorServerHandler administratorServerHandler);
+    public void sendGreeting(String host, String port);
+    public void sendGreetingToAll();
+
     public void systemExit0();
+    public void start();
 }

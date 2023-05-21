@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import robot.CleaningRobot;
 
 public class GreetingServiceClient {
-    public static void asynchronousStreamCall(final String host, final String port, CleaningRobot cleaningRobot) throws InterruptedException {
+    public void asynchronousStreamCall(final String host, final String port, CleaningRobot cleaningRobot) throws InterruptedException {
         // final ManagedChannel channel = ManagedChannelBuilder.forTarget("localhost:8080").usePlaintext().build();
         final ManagedChannel channel = ManagedChannelBuilder.forTarget(host + ":" + port)
                                                             .usePlaintext()
@@ -28,10 +28,10 @@ public class GreetingServiceClient {
 
         stub.streamGreeting(request, new StreamObserver<GreetingResponse>() {
             public void onNext(GreetingResponse greetingResponse) {
-                System.out.println(greetingResponse.getMessage());
+                // System.out.println(greetingResponse.getMessage());
             }
             public void onError(Throwable throwable) {
-                System.out.println("Error! "+throwable.getMessage());
+                System.out.println("Error! " + throwable.getMessage());
             }
             public void onCompleted() {
                 channel.shutdownNow();

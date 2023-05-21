@@ -54,20 +54,19 @@ public class MqttClientHandler {
                 // System.out.println("Message arrived: " + new String(message.getPayload()));
                 String time = new Timestamp(System.currentTimeMillis()).toString();
                 String receivedMessage = new String(message.getPayload());
-                System.out.println(client.getClientId() +" Received a Message! - Callback - Thread PID: " + Thread.currentThread().getId() +
-                            "\n\tTime:    " + time +
-                            "\n\tTopic:   " + topic +
-                            "\n\tMessage: " + receivedMessage +
-                            "\n\tQoS:     " + message.getQos() + "\n");
+                // System.out.println(client.getClientId() +" Received a Message! - Callback - Thread PID: " + Thread.currentThread().getId() +
+                //             "\n\tTime:    " + time +
+                //             "\n\tTopic:   " + topic +
+                //             "\n\tMessage: " + receivedMessage +
+                //             "\n\tQoS:     " + message.getQos() + "\n");
                    
                 MqttMessageAverageId measurementStream = gson.fromJson(receivedMessage, MqttMessageAverageId.class);
-                // System.out.println(measurementStream);
 
                 ArrayList<Double> measurementList = measurementStream.getMeasurementList(); 
                 int id = measurementStream.getId();
                 CommonCleaningRobots.getInstance().addMeasurementWithId(id, measurementList);
 
-                // System.out.println("\n ***  Press a random key to exit *** \n");
+                System.out.println("Received a message " + measurementList + " from " + id );
             }
 
             @Override
@@ -81,6 +80,7 @@ public class MqttClientHandler {
                 // System.out.println("Connection lost");
             }
         });
+
         try {
             this.client.subscribe(configurationHandler.getMqttTopic() + district, 2).waitForCompletion();
         } catch (MqttException e) {

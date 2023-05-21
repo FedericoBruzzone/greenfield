@@ -16,6 +16,7 @@ import robot.grpc.GreetingServiceClient;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +37,7 @@ public class CleaningRobot implements ICleaningRobot {
     private String host;
     private String port;
     private int district; 
-    private List<CleaningRobotInfo> activeCleaningRobot;
+    private volatile List<CleaningRobotInfo> activeCleaningRobot;
 
     private Client client;
     private String administratorServerURI;
@@ -46,13 +47,13 @@ public class CleaningRobot implements ICleaningRobot {
     private MqttAsyncClient mqttAsyncClient; 
     private MqttClientHandler mqttClientHandler;
     private MeasurementStream measurementStream; 
-
     private PM10Simulator pm10Simulator;
     private ComputeAverageThread computeAverageThread;
     private SendAverageThread sendAverageThread;
 
+    private GreetingServiceClient greetingServiceClient;
+    private GreetingServiceImpl greetingServiceImpl;
     private Server grpcServer;
-    
 
     public CleaningRobot() {}
 
@@ -65,7 +66,8 @@ public class CleaningRobot implements ICleaningRobot {
         this.host = this.configurationHandler.getRobotHost(); 
         this.port = String.valueOf(10000 + this.id);
         this.district = -1;
-        this.activeCleaningRobot = null;
+        // this.activeCleaningRobot = null;
+        this.activeCleaningRobot = new ArrayList<CleaningRobotInfo>();
 
         // AdministratorServer
         this.client = Client.create();
@@ -82,13 +84,16 @@ public class CleaningRobot implements ICleaningRobot {
         this.measurementStream = new MeasurementStream();
 
         // GRPC
-        GreetingServiceClient greetingServiceClient = new GreetingServiceClient();
-        GreetingServiceImpl greetingServiceImpl = new GreetingServiceImpl(this);
-        grpcServer = ServerBuilder.forPort(Integer.valueOf(this.port))
+        this.greetingServiceClient = new GreetingServiceClient();
+        this.greetingServiceImpl = new GreetingServiceImpl(this);
+        this.grpcServer = ServerBuilder.forPort(Integer.valueOf(this.port))
                                   .addService(greetingServiceImpl)
                                   .build();
     }
-
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    //Cleaning robot                                                              //
+    ////////////////////////////////////////////////////////////////////////////////
     public int getId() {
         return this.id;
     }
@@ -101,14 +106,65 @@ public class CleaningRobot implements ICleaningRobot {
         return this.port;
     }
     
-    public String getServerURI() {
-        return this.administratorServerURI;
-    }
-
     public int getDistrict() {
         return this.district;
     }
     
+    public String getServerURI() {
+        return this.administratorServerURI;
+    }
+   
+    public void addActiveCleaningRobot(CleaningRobotInfo cleaningRobotInfo) {
+        synchronized(this.activeCleaningRobot) {
+            this.activeCleaningRobot.add(cleaningRobotInfo);
+            System.out.println("Active cleaning robot: " + this.activeCleaningRobot);
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Administrator server                                                       //
+    ////////////////////////////////////////////////////////////////////////////////
+    private String configureAdministratorServerURI(ConfigurationHandler configurationHandler) {
+        return configurationHandler.getEndpointAdministratorServer();
+    }
+
+    public void setAdministratorServerHandler(Client client, String administratorServerURI) {
+        this.administratorServerHandler = new AdministratorServerHandler(client, administratorServerURI);
+    }
+    
+    public void setAdministratorServerHandler(AdministratorServerHandler administratorServerHandler) {
+        this.administratorServerHandler = administratorServerHandler;
+    }
+    
+    public void registerToAdministratorServer() {
+        ClientResponse clientResponse = administratorServerHandler.registerCleaningRobot(this);
+        RobotAddResponse robotAddResponse = clientResponse.getEntity(RobotAddResponse.class);
+        // System.out.println("Response: " + robotAddResponse);        
+        System.out.println("Response: " + clientResponse);        
+        if (clientResponse.getStatus() != 200) {
+            System.exit(0);
+        }
+        this.district = robotAddResponse.district;
+        synchronized(this.activeCleaningRobot) {
+            this.activeCleaningRobot = robotAddResponse.listActiveCleaningRobot != null ? 
+                                        robotAddResponse.listActiveCleaningRobot
+                                                        .stream()
+                                                        .map(cr -> new CleaningRobotInfo(cr.getId(),
+                                                                                         cr.getHost(),
+                                                                                         cr.getPort(),
+                                                                                         cr.getDistrict()))
+                                                        .collect(Collectors.toList()) : this.activeCleaningRobot;
+        }
+    }
+    
+    public void removeFromAdministratorServer() {
+        ClientResponse clientResponse = administratorServerHandler.removeCleaningRobot(this);
+        System.out.println("Response: " + clientResponse);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Mqtt                                                                       //
+    ////////////////////////////////////////////////////////////////////////////////
     public void createPm10Simulator() {
         this.pm10Simulator = new PM10Simulator(this.slidingWindow);
     }
@@ -171,67 +227,44 @@ public class CleaningRobot implements ICleaningRobot {
         this.mqttClientHandler.disconnect();
     }
 
-    private String configureAdministratorServerURI(ConfigurationHandler configurationHandler) {
-        return configurationHandler.getEndpointAdministratorServer();
-    }
-
-    public void setAdministratorServerHandler(Client client, String administratorServerURI) {
-        this.administratorServerHandler = new AdministratorServerHandler(client, administratorServerURI);
-    }
-    
-    public void setAdministratorServerHandler(AdministratorServerHandler administratorServerHandler) {
-        this.administratorServerHandler = administratorServerHandler;
-    }
-    
-    public void registerToAdministratorServer() {
-        ClientResponse clientResponse = administratorServerHandler.registerCleaningRobot(this);
-        RobotAddResponse robotAddResponse = clientResponse.getEntity(RobotAddResponse.class);
-        // System.out.println("Response: " + robotAddResponse);        
-        System.out.println("Response: " + clientResponse);        
-        if (clientResponse.getStatus() != 200) {
-            System.exit(0);
-        }
-        this.district = robotAddResponse.district;
-        this.activeCleaningRobot = robotAddResponse.listActiveCleaningRobot != null ? 
-                                    robotAddResponse.listActiveCleaningRobot
-                                                    .stream()
-                                                    .map(cr -> new CleaningRobotInfo(cr.getId(),
-                                                                                     cr.getHost(),
-                                                                                     cr.getPort()))
-                                                    .collect(Collectors.toList()) : null;
-    }
-    
-    public void removeFromAdministratorServer() {
-        ClientResponse clientResponse = administratorServerHandler.removeCleaningRobot(this);
-        System.out.println("Response: " + clientResponse);
-    }
-
+    ////////////////////////////////////////////////////////////////////////////////
+    // Grpc                                                                       //
+    ////////////////////////////////////////////////////////////////////////////////
     public void startGrpcServer() {
         try {
             grpcServer.start();
-            System.out.println("Server started!");
-            grpcServer.awaitTermination();
+            // System.out.println("Server started!");
+            // grpcServer.awaitTermination();
         } catch (IOException e) { 
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        }// } catch (InterruptedException e) {
+        //     e.printStackTrace();
+        // }
     }
 
     public void stopGrpcServer() {
         grpcServer.shutdown();
     }
 
-    public void sayGreeting() {
-        // TODO
-        fsdkjm
+    public void sendGreeting(String host, String port) {
+        try {
+            greetingServiceClient.asynchronousStreamCall(host, port, this);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void sayGreetingToAll() {
-        // TODO
-        fsd,kmh
+    public void sendGreetingToAll() {
+        synchronized(this.activeCleaningRobot) {
+            this.activeCleaningRobot.forEach(cr -> {
+                this.sendGreeting(cr.host, cr.port);
+            });
+        }
     }
     
+    ////////////////////////////////////////////////////////////////////////////////
+    // Utility                                                                    //
+    ////////////////////////////////////////////////////////////////////////////////
     public void systemExit0() {
         System.out.println("CleaningRobot " + this.getId() + " is going to exit");
         this.removeFromAdministratorServer();
@@ -239,6 +272,14 @@ public class CleaningRobot implements ICleaningRobot {
         this.disconnectMqttClient();
         this.stopGrpcServer();
         System.exit(0);
+    }
+
+    public void start() {
+        this.registerToAdministratorServer();
+        this.createAllThreads();
+        this.startAllThreads();
+        this.startGrpcServer();
+        this.sendGreetingToAll();
     }
 
     private static void printMenu() {
@@ -255,11 +296,7 @@ public class CleaningRobot implements ICleaningRobot {
             int id = Integer.parseInt(inFromUserId.readLine());  
             ICleaningRobot cleaningRobot = new CleaningRobot(id);
 
-            cleaningRobot.registerToAdministratorServer();
-            cleaningRobot.createAllThreads();
-            cleaningRobot.startAllThreads();
-            cleaningRobot.startGrpcServer();
-            //TODO hello to other robots
+            cleaningRobot.start();
             
 
             int choice;
@@ -288,10 +325,7 @@ public class CleaningRobot implements ICleaningRobot {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                } finally {
-                    cleaningRobot.systemExit0();
-                    System.out.println("Bye bye");
-                }
+                } 
             }
         } catch (IOException e) {
             e.printStackTrace();

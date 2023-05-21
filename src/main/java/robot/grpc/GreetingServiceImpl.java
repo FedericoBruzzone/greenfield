@@ -5,6 +5,7 @@ import proto.grpc.GreetingServiceOuterClass.*;
 import io.grpc.stub.StreamObserver;
 
 import robot.CleaningRobot;
+import robot.CleaningRobotInfo;
 
 public class GreetingServiceImpl extends GreetingServiceImplBase {
     
@@ -17,14 +18,16 @@ public class GreetingServiceImpl extends GreetingServiceImplBase {
     @Override
     public void streamGreeting(GreetingRequest request, StreamObserver<GreetingResponse> responseObserver){
 
-        System.out.println("Metodo stream chiamato!");
-        System.out.println(request);
+        // System.out.println(request);
+        CleaningRobotInfo cleaningRobotInfo = new CleaningRobotInfo(request.getId(), 
+                                                                    request.getHost(), 
+                                                                    request.getPort(),
+                                                                    request.getDistrict());
+        this.cleaningRobot.addActiveCleaningRobot(cleaningRobotInfo);
 
-        // this.cleaningRobot.add(request.getId());
+        // GreetingResponse response = GreetingResponse.newBuilder().setMessage(cleaningRobotInfo.toString()).build();
 
-        GreetingResponse response = GreetingResponse.newBuilder().setMessage("Add: " + request.getId()).build();
-
-        responseObserver.onNext(response);
+        // responseObserver.onNext(response);
 
         responseObserver.onCompleted();
 
