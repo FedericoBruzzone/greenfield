@@ -23,6 +23,8 @@ public class GreetingServiceImpl extends GreetingServiceImplBase {
                                                                     request.getHost(), 
                                                                     request.getPort(),
                                                                     request.getDistrict());
+        ksjdfhfkdjshf
+        // Check if alreay exists
         this.cleaningRobot.addActiveCleaningRobot(cleaningRobotInfo);
 
         // GreetingResponse response = GreetingResponse.newBuilder().setMessage(cleaningRobotInfo.toString()).build();

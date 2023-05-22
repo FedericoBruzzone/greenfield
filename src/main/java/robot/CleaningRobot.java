@@ -146,14 +146,24 @@ public class CleaningRobot implements ICleaningRobot {
         }
         this.district = robotAddResponse.district;
         synchronized(this.activeCleaningRobot) {
-            this.activeCleaningRobot = robotAddResponse.listActiveCleaningRobot != null ? 
-                                        robotAddResponse.listActiveCleaningRobot
-                                                        .stream()
-                                                        .map(cr -> new CleaningRobotInfo(cr.getId(),
-                                                                                         cr.getHost(),
-                                                                                         cr.getPort(),
-                                                                                         cr.getDistrict()))
-                                                        .collect(Collectors.toList()) : this.activeCleaningRobot;
+            if (robotAddResponse.listActiveCleaningRobot != null) {
+                this.activeCleaningRobot.addAll(robotAddResponse.listActiveCleaningRobot
+                                                                .stream()
+                                                                .map(cr -> new CleaningRobotInfo(cr.getId(),
+                                                                                                 cr.getHost(),
+                                                                                                 cr.getPort(),
+                                                                                                 cr.getDistrict()))
+                                                                .collect(Collectors.toList()));
+            }
+            System.out.println("Active cleaning robot: " + this.activeCleaningRobot);
+            // this.activeCleaningRobot = robotAddResponse.listActiveCleaningRobot != null ? 
+            //                             robotAddResponse.listActiveCleaningRobot
+            //                                             .stream()
+            //                                             .map(cr -> new CleaningRobotInfo(cr.getId(),
+            //                                                                              cr.getHost(),
+            //                                                                              cr.getPort(),
+            //                                                                              cr.getDistrict()))
+            //                                             .collect(Collectors.toList()) : this.activeCleaningRobot;
         }
     }
     
@@ -275,10 +285,10 @@ public class CleaningRobot implements ICleaningRobot {
     }
 
     public void start() {
+        this.startGrpcServer();
         this.registerToAdministratorServer();
         this.createAllThreads();
         this.startAllThreads();
-        this.startGrpcServer();
         this.sendGreetingToAll();
     }
 
