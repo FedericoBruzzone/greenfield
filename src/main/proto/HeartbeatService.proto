@@ -1,0 +1,19 @@
+syntax = "proto3";
+package proto.grpc;
+
+/* private int id; */
+/* private String host; */
+/* private String port; */
+/* private int district; */
+
+message HeartbeatRequest {
+}
+
+message HeartbeatResponse {
+}
+
+
+service HeartbeatService {
+    rpc greeting(HeartbeatRequest) returns (HeartbeatResponse);
+    rpc streamGreeting(HeartbeatRequest) returns (stream HeartbeatResponse);
+}

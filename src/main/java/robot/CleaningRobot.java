@@ -12,6 +12,8 @@ import robot.thread.SendAverageThread;
 import robot.thread.MeasurementStream; 
 import robot.grpc.GreetingServiceImpl;
 import robot.grpc.GreetingServiceClient;
+import robot.grpc.HeartbeatServiceClient;
+import robot.grpc.HeartbeatServiceImpl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -53,6 +55,8 @@ public class CleaningRobot implements ICleaningRobot {
 
     private GreetingServiceClient greetingServiceClient;
     private GreetingServiceImpl greetingServiceImpl;
+    private HeartbeatServiceClient heartbeatServiceClient;
+    private HeartbeatServiceImpl heartbeatServiceImpl;
     private Server grpcServer;
 
     public CleaningRobot() {}
@@ -87,7 +91,8 @@ public class CleaningRobot implements ICleaningRobot {
         this.greetingServiceClient = new GreetingServiceClient();
         this.greetingServiceImpl = new GreetingServiceImpl(this);
         this.grpcServer = ServerBuilder.forPort(Integer.valueOf(this.port))
-                                  .addService(greetingServiceImpl)
+                                  .addService(this.greetingServiceImpl)
+                                  // .addService(this.heartbeatServiceImpl)
                                   .build();
     }
     
