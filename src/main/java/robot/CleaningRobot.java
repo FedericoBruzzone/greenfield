@@ -8,6 +8,7 @@ import common.response.RobotAddResponse;
 import simulator.SlidingWindow;
 import simulator.PM10Simulator;
 import robot.thread.ComputeAverageThread;
+import robot.thread.HeartbeatThread;
 import robot.thread.SendAverageThread;
 import robot.thread.MeasurementStream; 
 import robot.grpc.GreetingServiceImpl;
@@ -53,11 +54,12 @@ public class CleaningRobot implements ICleaningRobot {
     private ComputeAverageThread computeAverageThread;
     private SendAverageThread sendAverageThread;
 
-    private GreetingServiceClient greetingServiceClient;
-    private GreetingServiceImpl greetingServiceImpl;
-    private HeartbeatServiceClient heartbeatServiceClient;
-    private HeartbeatServiceImpl heartbeatServiceImpl;
+    // private GreetingServiceClient greetingServiceClient;
+    // private GreetingServiceImpl greetingServiceImpl;
+    // private HeartbeatServiceClient heartbeatServiceClient;
+    // private HeartbeatServiceImpl heartbeatServiceImpl;
     private Server grpcServer;
+    private HeartbeatThread heartbeatThread;
 
     public CleaningRobot() {}
 
@@ -88,12 +90,14 @@ public class CleaningRobot implements ICleaningRobot {
         this.measurementStream = new MeasurementStream();
 
         // GRPC
-        this.greetingServiceClient = new GreetingServiceClient();
-        this.greetingServiceImpl = new GreetingServiceImpl(this);
+        // this.greetingServiceClient = new GreetingServiceClient();
+        // this.greetingServiceImpl = new GreetingServiceImpl(this);
         this.grpcServer = ServerBuilder.forPort(Integer.valueOf(this.port))
-                                  .addService(this.greetingServiceImpl)
+                                  .addService(new GreetingServiceImpl(this))
                                   // .addService(this.heartbeatServiceImpl)
                                   .build();
+        
+    
     }
     
     ////////////////////////////////////////////////////////////////////////////////
@@ -219,24 +223,6 @@ public class CleaningRobot implements ICleaningRobot {
     public void stopSendAverageThread() {
         this.sendAverageThread.stop();
     }
-    
-    public void createAllThreads() {
-        this.createPm10Simulator();
-        this.createComputeAverageThread();
-        this.createSendAverageThread();
-    }
-
-    public void startAllThreads() {
-        this.startPm10Simulator();
-        this.startComputeAverageThread();
-        this.startSendAverageThread();
-    }
-
-    public void stopAllThreads() {
-        this.stopPm10Simulator();
-        this.stopComputeAverageThread();
-        this.stopSendAverageThread();
-    }
 
     public void disconnectMqttClient() {
         this.mqttClientHandler.disconnect();
@@ -263,7 +249,8 @@ public class CleaningRobot implements ICleaningRobot {
 
     public void sendGreeting(String host, String port) {
         try {
-            greetingServiceClient.asynchronousStreamCall(host, port, this);
+            // greetingServiceClient.asynchronousStreamCall(host, port, this);
+            GreetingServiceClient.asynchronousStreamCall(host, port, this);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -277,12 +264,62 @@ public class CleaningRobot implements ICleaningRobot {
         }
     }
     
+    public void sendHeartbeat(String host, String port) {
+        try {
+            HeartbeatServiceClient.asynchronousStreamCall(host, port, this);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendHeartbeatToAll() {
+        synchronized(this.activeCleaningRobot) {
+            this.activeCleaningRobot.forEach(cr -> {
+                this.sendHeartbeat(cr.host, cr.port);
+            });
+        }
+    }
+
+    public void createHeartbeatThread() {
+        this.heartbeatThread = new HeartbeatThread(this);
+    }
+    
+    public void startHeartbeatThread() {
+        this.heartbeatThread.start();
+    }
+    
+    public void stopHeartbeatThread() {
+        this.heartbeatThread.stop();
+    }
+
     ////////////////////////////////////////////////////////////////////////////////
     // Utility                                                                    //
     ////////////////////////////////////////////////////////////////////////////////
+    public void createAllThreads() {
+        this.createPm10Simulator();
+        this.createComputeAverageThread();
+        this.createSendAverageThread();
+        this.createHeartbeatThread();
+    }
+
+    public void startAllThreads() {
+        this.startPm10Simulator();
+        this.startComputeAverageThread();
+        this.startSendAverageThread();
+        this.startHeartbeatThread();
+    }
+
+    public void stopAllThreads() {
+        this.stopPm10Simulator();
+        this.stopComputeAverageThread();
+        this.stopSendAverageThread();
+        this.stopHeartbeatThread();
+    }
+
     public void systemExit0() {
         System.out.println("CleaningRobot " + this.getId() + " is going to exit");
         this.removeFromAdministratorServer();
+        // addio a tutti
         this.stopAllThreads();
         this.disconnectMqttClient();
         this.stopGrpcServer();
@@ -292,9 +329,9 @@ public class CleaningRobot implements ICleaningRobot {
     public void start() {
         this.startGrpcServer();
         this.registerToAdministratorServer();
+        this.sendGreetingToAll();
         this.createAllThreads();
         this.startAllThreads();
-        this.sendGreetingToAll();
     }
 
     private static void printMenu() {

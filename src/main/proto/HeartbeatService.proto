@@ -7,13 +7,15 @@ package proto.grpc;
 /* private int district; */
 
 message HeartbeatRequest {
+    int32 id = 1;
 }
 
 message HeartbeatResponse {
+    int32 id = 1;
 }
 
 
 service HeartbeatService {
-    rpc greeting(HeartbeatRequest) returns (HeartbeatResponse);
-    rpc streamGreeting(HeartbeatRequest) returns (stream HeartbeatResponse);
+    rpc heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+    rpc streamHeartbeat(HeartbeatRequest) returns (stream HeartbeatResponse);
 }

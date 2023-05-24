@@ -23,8 +23,6 @@ public class AdministratorServerHandler {
         // if (clientResponse.getStatus() != 200) {
         //     throw new RuntimeException("Failed [" +clientResponse.getStatus()+ "]: There is another Cleaning Robot with this ID ");
         // } 
-        
-        
         return clientResponse;
     }
 

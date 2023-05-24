@@ -23,16 +23,21 @@ public interface ICleaningRobot {
     public void stopPm10Simulator();
     public void stopComputeAverageThread();
     public void stopSendAverageThread();
-    public void createAllThreads();
-    public void startAllThreads();
-    public void stopAllThreads();
     public void disconnectMqttClient();
 
     public void startGrpcServer();
     public void stopGrpcServer();
     public void sendGreeting(String host, String port);
     public void sendGreetingToAll();
-
+    public void sendHeartbeat(String host, String port);
+    public void sendHeartbeatToAll();
+    public void createHeartbeatThread();
+    public void startHeartbeatThread();
+    public void stopHeartbeatThread();
+    
+    public void createAllThreads();
+    public void startAllThreads();
+    public void stopAllThreads();
     public void systemExit0();
     public void start();
 }
