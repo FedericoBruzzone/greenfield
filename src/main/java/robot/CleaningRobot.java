@@ -13,6 +13,8 @@ import robot.thread.SendAverageThread;
 import robot.thread.MeasurementStream; 
 import robot.grpc.GreetingServiceImpl;
 import robot.grpc.GreetingServiceClient;
+import robot.grpc.GoodbyeServiceImpl;
+import robot.grpc.GoodbyeServiceClient;
 import robot.grpc.HeartbeatServiceClient;
 import robot.grpc.HeartbeatServiceImpl;
 
@@ -94,6 +96,7 @@ public class CleaningRobot implements ICleaningRobot {
         // this.greetingServiceImpl = new GreetingServiceImpl(this);
         this.grpcServer = ServerBuilder.forPort(Integer.valueOf(this.port))
                                   .addService(new GreetingServiceImpl(this))
+                                  .addService(new GoodbyeServiceImpl(this))
                                   .addService(new HeartbeatServiceImpl(this))
                                   .build();
         
@@ -136,7 +139,8 @@ public class CleaningRobot implements ICleaningRobot {
 
     public void removeUnactiveCleaningRobot(CleaningRobotInfo cleaningRobotInfo) {
         synchronized(this.activeCleaningRobots) {
-            this.activeCleaningRobots.remove(cleaningRobotInfo);
+            this.activeCleaningRobots.removeIf(cr -> cr.id == cleaningRobotInfo.id);
+            // this.activeCleaningRobots.remove(cleaningRobotInfo);
             System.out.println("Active cleaning robot: " + this.activeCleaningRobots);
         }
     }
@@ -158,12 +162,14 @@ public class CleaningRobot implements ICleaningRobot {
     
     public void registerToAdministratorServer() {
         ClientResponse clientResponse = administratorServerHandler.registerCleaningRobot(this);
-        RobotAddResponse robotAddResponse = clientResponse.getEntity(RobotAddResponse.class);
-        // System.out.println("Response: " + robotAddResponse);        
         // System.out.println("Response: " + clientResponse);        
         if (clientResponse.getStatus() != 200) {
+            System.out.println("Failed [" +clientResponse.getStatus()+ "]: There is another Cleaning Robot with this ID");
             System.exit(0);
         }
+        RobotAddResponse robotAddResponse = clientResponse.getEntity(RobotAddResponse.class);
+        // System.out.println("Response: " + robotAddResponse);        
+        //
         this.district = robotAddResponse.district;
         synchronized(this.activeCleaningRobots) {
             if (robotAddResponse.listActiveCleaningRobot != null) {
@@ -272,6 +278,22 @@ public class CleaningRobot implements ICleaningRobot {
         }
     }
     
+    public void sendGoodbye(CleaningRobotInfo cleaningRobotInfo) {
+        try {
+            GoodbyeServiceClient.asynchronousStreamCall(cleaningRobotInfo, this);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendGoodbyeToAll() {
+        synchronized(this.activeCleaningRobots) {
+            this.activeCleaningRobots.forEach(cr -> {
+                this.sendGoodbye(cr);
+            });
+        }
+    }
+    
     public void sendHeartbeat(CleaningRobotInfo cleaningRobotInfo) {
         try {
             HeartbeatServiceClient.asynchronousStreamCall(cleaningRobotInfo, this);
@@ -325,9 +347,10 @@ public class CleaningRobot implements ICleaningRobot {
     }
 
     public void systemExit0() {
+        // TODO complete any operation at the mechanic 
         System.out.println("CleaningRobot " + this.getId() + " is going to exit");
         this.removeFromAdministratorServer();
-        // addio a tutti
+        this.sendGoodbyeToAll(); 
         this.stopAllThreads();
         this.disconnectMqttClient();
         this.stopGrpcServer();
@@ -335,8 +358,8 @@ public class CleaningRobot implements ICleaningRobot {
     }
 
     public void start() {
-        this.startGrpcServer();
         this.registerToAdministratorServer();
+        this.startGrpcServer();
         this.sendGreetingToAll();
         this.createAllThreads();
         this.startAllThreads();
@@ -372,8 +395,6 @@ public class CleaningRobot implements ICleaningRobot {
                             System.exit(1);
                         case 1:
                             System.out.println("quit");
-                            // TODO complete any operation at the mechanic 
-                            // TODO send to the other robot?
                             cleaningRobot.systemExit0();
                         case 2:
                             System.out.println("fix");

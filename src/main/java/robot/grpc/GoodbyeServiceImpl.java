@@ -21,7 +21,7 @@ public class GoodbyeServiceImpl extends GoodbyeServiceImplBase {
                                                                     request.getHost(), 
                                                                     request.getPort(),
                                                                     request.getDistrict());
-        this.cleaningRobot.addActiveCleaningRobot(cleaningRobotInfo);
+        this.cleaningRobot.removeUnactiveCleaningRobot(cleaningRobotInfo);
         // GoodbyeResponse response = GoodbyeResponse.newBuilder().setMessage(cleaningRobotInfo.toString()).build();
         // responseObserver.onNext(response);
         responseObserver.onCompleted();

@@ -34,6 +34,8 @@ public interface ICleaningRobot {
     public void stopGrpcServer();
     public void sendGreeting(CleaningRobotInfo cleaningRobotInfo);
     public void sendGreetingToAll();
+    public void sendGoodbye(CleaningRobotInfo cleaningRobotInfo);
+    public void sendGoodbyeToAll();
     public void sendHeartbeat(CleaningRobotInfo cleaningRobotInfo);
     public void sendHeartbeatToAll();
     public void createHeartbeatThread();

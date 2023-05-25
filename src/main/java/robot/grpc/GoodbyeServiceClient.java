@@ -20,15 +20,15 @@ public class GoodbyeServiceClient {
         GoodbyeServiceStub stub = GoodbyeServiceGrpc.newStub(channel);
 
         GoodbyeRequest request = GoodbyeRequest.newBuilder()
-                                                 .setId(cleaningRobot.getId())
-                                                 .setHost(cleaningRobot.getHost())
-                                                 .setPort(cleaningRobot.getPort())
-                                                 .setDistrict(cleaningRobot.getDistrict())
-                                                 .build();
+                                               .setId(cleaningRobot.getId())
+                                               .setHost(cleaningRobot.getHost())
+                                               .setPort(cleaningRobot.getPort())
+                                               .setDistrict(cleaningRobot.getDistrict())
+                                               .build();
         
         stub.streamGoodbye(request, new StreamObserver<GoodbyeResponse>() {
-            public void onNext(GoodbyeResponse greetingResponse) {
-                // System.out.println(goodbyeResponse.getMessage());
+            public void onNext(GoodbyeResponse goodbyeResponse) {
+                System.out.println(goodbyeResponse.getMessage());
             }
             public void onError(Throwable throwable) {
                 System.out.println("Error! " + throwable.getMessage());
