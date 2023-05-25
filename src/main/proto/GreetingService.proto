@@ -1,11 +1,6 @@
 syntax = "proto3";
 package proto.grpc;
 
-/* private int id; */
-/* private String host; */
-/* private String port; */
-/* private int district; */
-
 message GreetingRequest {
     int32 id = 1;
     string host = 2;

@@ -13,13 +13,14 @@ public class HeartbeatServiceImpl extends HeartbeatServiceImplBase {
     public HeartbeatServiceImpl(CleaningRobot cleaningRobot){
         this.cleaningRobot = cleaningRobot;
     }
-    
+
     @Override
     public void streamHeartbeat(HeartbeatRequest request, StreamObserver<HeartbeatResponse> responseObserver) {
-        HeartbeatResponse response = HeartbeatResponse.newBuilder()
-                                                    .setId(this.cleaningRobot.getId())
-                                                    .build();
-        responseObserver.onNext(response);
+        // System.out.println("Received heartbeat from " + request.getId());
+        // HeartbeatResponse response = HeartbeatResponse.newBuilder()
+        //                                             .setId(this.cleaningRobot.getId())
+        //                                             .build();
+        // responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 }

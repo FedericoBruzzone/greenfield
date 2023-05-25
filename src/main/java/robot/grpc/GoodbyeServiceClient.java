@@ -1,8 +1,8 @@
 package robot.grpc; 
 
-import proto.grpc.GreetingServiceGrpc;
-import proto.grpc.GreetingServiceGrpc.*;
-import proto.grpc.GreetingServiceOuterClass.*;
+import proto.grpc.GoodbyeServiceGrpc;
+import proto.grpc.GoodbyeServiceGrpc.*;
+import proto.grpc.GoodbyeServiceOuterClass.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
@@ -12,24 +12,23 @@ import java.util.concurrent.TimeUnit;
 import robot.CleaningRobot;
 import robot.CleaningRobotInfo;
 
-public class GreetingServiceClient {
+public class GoodbyeServiceClient {
     public static void asynchronousStreamCall(final CleaningRobotInfo cleaningRobotInfo, CleaningRobot cleaningRobot) throws InterruptedException {
-        // final ManagedChannel channel = ManagedChannelBuilder.forTarget("localhost:8080").usePlaintext().build();
         final ManagedChannel channel = ManagedChannelBuilder.forTarget(cleaningRobotInfo.host + ":" + cleaningRobotInfo.port)
                                                             .usePlaintext()
                                                             .build();
-        GreetingServiceStub stub = GreetingServiceGrpc.newStub(channel);
+        GoodbyeServiceStub stub = GoodbyeServiceGrpc.newStub(channel);
 
-        GreetingRequest request = GreetingRequest.newBuilder()
+        GoodbyeRequest request = GoodbyeRequest.newBuilder()
                                                  .setId(cleaningRobot.getId())
                                                  .setHost(cleaningRobot.getHost())
                                                  .setPort(cleaningRobot.getPort())
                                                  .setDistrict(cleaningRobot.getDistrict())
                                                  .build();
         
-        stub.streamGreeting(request, new StreamObserver<GreetingResponse>() {
-            public void onNext(GreetingResponse greetingResponse) {
-                // System.out.println(greetingResponse.getMessage());
+        stub.streamGoodbye(request, new StreamObserver<GoodbyeResponse>() {
+            public void onNext(GoodbyeResponse greetingResponse) {
+                // System.out.println(goodbyeResponse.getMessage());
             }
             public void onError(Throwable throwable) {
                 System.out.println("Error! " + throwable.getMessage());

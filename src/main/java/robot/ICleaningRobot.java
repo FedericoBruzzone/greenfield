@@ -1,5 +1,6 @@
 package robot;
 
+import java.util.List;
 import com.sun.jersey.api.client.Client;
 
 public interface ICleaningRobot {
@@ -8,11 +9,15 @@ public interface ICleaningRobot {
     public String getPort();
     public int getDistrict();
     public String getServerURI();
+    public List<CleaningRobotInfo> getActiveCleaningRobots();
+    public void addActiveCleaningRobot(CleaningRobotInfo cleaningRobotInfo);
+    public void removeUnactiveCleaningRobot(CleaningRobotInfo cleaningRobotInfo);
     
-    public void registerToAdministratorServer(); 
-    public void removeFromAdministratorServer(); 
     public void setAdministratorServerHandler(Client client, String serverURI);
     public void setAdministratorServerHandler(AdministratorServerHandler administratorServerHandler);
+    public void registerToAdministratorServer(); 
+    public void removeFromAdministratorServer(); 
+    public void removeCleaningRobotFromAdministratorServer(CleaningRobotInfo cleaningRobotInfo);
 
     public void createPm10Simulator();
     public void createComputeAverageThread();
@@ -27,9 +32,9 @@ public interface ICleaningRobot {
 
     public void startGrpcServer();
     public void stopGrpcServer();
-    public void sendGreeting(String host, String port);
+    public void sendGreeting(CleaningRobotInfo cleaningRobotInfo);
     public void sendGreetingToAll();
-    public void sendHeartbeat(String host, String port);
+    public void sendHeartbeat(CleaningRobotInfo cleaningRobotInfo);
     public void sendHeartbeatToAll();
     public void createHeartbeatThread();
     public void startHeartbeatThread();

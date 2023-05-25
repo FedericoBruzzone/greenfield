@@ -33,8 +33,7 @@ public class RobotCleaningService {
         }
         RobotAddResponse robotAddResponse = new RobotAddResponse(CommonCleaningRobots.getInstance().getCleaningRobotsWithout(cleaningRobot), 
                                                                  newCleaningRobot.getDistrict());
-        System.out.println("/robot/add " + CommonCleaningRobots.getInstance()
-                                                               .getCleaningRobots());
+        System.out.println("/robot/add " + cleaningRobot);
         return Response.ok(robotAddResponse).build();
     }
     
@@ -43,7 +42,7 @@ public class RobotCleaningService {
     @Consumes({"application/json", "application/xml"})
     public Response removeCleaningRobot(CommonCleaningRobot cleaningRobot){
         if (CommonCleaningRobots.getInstance().remove(cleaningRobot)) {
-            System.out.println("/robot/remove " + CommonCleaningRobots.getInstance().getCleaningRobots());
+            System.out.println("/robot/remove " + cleaningRobot);
             return Response.ok().build(); 
         }
         else {

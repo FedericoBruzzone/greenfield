@@ -40,7 +40,7 @@ public class CleaningRobot implements ICleaningRobot {
     private String host;
     private String port;
     private int district; 
-    private volatile List<CleaningRobotInfo> activeCleaningRobot;
+    private volatile List<CleaningRobotInfo> activeCleaningRobots;
 
     private Client client;
     private String administratorServerURI;
@@ -73,7 +73,7 @@ public class CleaningRobot implements ICleaningRobot {
         this.port = String.valueOf(10000 + this.id);
         this.district = -1;
         // this.activeCleaningRobot = null;
-        this.activeCleaningRobot = new ArrayList<CleaningRobotInfo>();
+        this.activeCleaningRobots = new ArrayList<CleaningRobotInfo>();
 
         // AdministratorServer
         this.client = Client.create();
@@ -94,7 +94,7 @@ public class CleaningRobot implements ICleaningRobot {
         // this.greetingServiceImpl = new GreetingServiceImpl(this);
         this.grpcServer = ServerBuilder.forPort(Integer.valueOf(this.port))
                                   .addService(new GreetingServiceImpl(this))
-                                  // .addService(this.heartbeatServiceImpl)
+                                  .addService(new HeartbeatServiceImpl(this))
                                   .build();
         
     
@@ -122,11 +122,22 @@ public class CleaningRobot implements ICleaningRobot {
     public String getServerURI() {
         return this.administratorServerURI;
     }
-   
+  
+    public List<CleaningRobotInfo> getActiveCleaningRobots() {
+        return new ArrayList<CleaningRobotInfo>(this.activeCleaningRobots);
+    }
+
     public void addActiveCleaningRobot(CleaningRobotInfo cleaningRobotInfo) {
-        synchronized(this.activeCleaningRobot) {
-            this.activeCleaningRobot.add(cleaningRobotInfo);
-            System.out.println("Active cleaning robot: " + this.activeCleaningRobot);
+        synchronized(this.activeCleaningRobots) {
+            this.activeCleaningRobots.add(cleaningRobotInfo);
+            System.out.println("Active cleaning robot: " + this.activeCleaningRobots);
+        }
+    }
+
+    public void removeUnactiveCleaningRobot(CleaningRobotInfo cleaningRobotInfo) {
+        synchronized(this.activeCleaningRobots) {
+            this.activeCleaningRobots.remove(cleaningRobotInfo);
+            System.out.println("Active cleaning robot: " + this.activeCleaningRobots);
         }
     }
 
@@ -149,36 +160,33 @@ public class CleaningRobot implements ICleaningRobot {
         ClientResponse clientResponse = administratorServerHandler.registerCleaningRobot(this);
         RobotAddResponse robotAddResponse = clientResponse.getEntity(RobotAddResponse.class);
         // System.out.println("Response: " + robotAddResponse);        
-        System.out.println("Response: " + clientResponse);        
+        // System.out.println("Response: " + clientResponse);        
         if (clientResponse.getStatus() != 200) {
             System.exit(0);
         }
         this.district = robotAddResponse.district;
-        synchronized(this.activeCleaningRobot) {
+        synchronized(this.activeCleaningRobots) {
             if (robotAddResponse.listActiveCleaningRobot != null) {
-                this.activeCleaningRobot.addAll(robotAddResponse.listActiveCleaningRobot
-                                                                .stream()
-                                                                .map(cr -> new CleaningRobotInfo(cr.getId(),
-                                                                                                 cr.getHost(),
-                                                                                                 cr.getPort(),
-                                                                                                 cr.getDistrict()))
-                                                                .collect(Collectors.toList()));
+                this.activeCleaningRobots.addAll(robotAddResponse.listActiveCleaningRobot
+                                                                 .stream()
+                                                                 .map(cr -> new CleaningRobotInfo(cr.getId(),
+                                                                                                  cr.getHost(),
+                                                                                                  cr.getPort(),
+                                                                                                  cr.getDistrict()))
+                                                                 .collect(Collectors.toList()));
             }
-            System.out.println("Active cleaning robot: " + this.activeCleaningRobot);
-            // this.activeCleaningRobot = robotAddResponse.listActiveCleaningRobot != null ? 
-            //                             robotAddResponse.listActiveCleaningRobot
-            //                                             .stream()
-            //                                             .map(cr -> new CleaningRobotInfo(cr.getId(),
-            //                                                                              cr.getHost(),
-            //                                                                              cr.getPort(),
-            //                                                                              cr.getDistrict()))
-            //                                             .collect(Collectors.toList()) : this.activeCleaningRobot;
+            System.out.println("Active cleaning robot: " + this.activeCleaningRobots);
         }
     }
-    
+
     public void removeFromAdministratorServer() {
         ClientResponse clientResponse = administratorServerHandler.removeCleaningRobot(this);
-        System.out.println("Response: " + clientResponse);
+        // System.out.println("Response: " + clientResponse);
+    }
+
+    public void removeCleaningRobotFromAdministratorServer(CleaningRobotInfo cleaningRobotInfo) {
+        ClientResponse clientResponse = administratorServerHandler.removeCleaningRobot(cleaningRobotInfo);        
+        // System.out.println("Response: " + clientResponse);
     }
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -247,35 +255,35 @@ public class CleaningRobot implements ICleaningRobot {
         grpcServer.shutdown();
     }
 
-    public void sendGreeting(String host, String port) {
+    public void sendGreeting(CleaningRobotInfo cleaningRobotInfo) {
         try {
             // greetingServiceClient.asynchronousStreamCall(host, port, this);
-            GreetingServiceClient.asynchronousStreamCall(host, port, this);
+            GreetingServiceClient.asynchronousStreamCall(cleaningRobotInfo, this);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     public void sendGreetingToAll() {
-        synchronized(this.activeCleaningRobot) {
-            this.activeCleaningRobot.forEach(cr -> {
-                this.sendGreeting(cr.host, cr.port);
+        synchronized(this.activeCleaningRobots) {
+            this.activeCleaningRobots.forEach(cr -> {
+                this.sendGreeting(cr);
             });
         }
     }
     
-    public void sendHeartbeat(String host, String port) {
+    public void sendHeartbeat(CleaningRobotInfo cleaningRobotInfo) {
         try {
-            HeartbeatServiceClient.asynchronousStreamCall(host, port, this);
+            HeartbeatServiceClient.asynchronousStreamCall(cleaningRobotInfo, this);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     public void sendHeartbeatToAll() {
-        synchronized(this.activeCleaningRobot) {
-            this.activeCleaningRobot.forEach(cr -> {
-                this.sendHeartbeat(cr.host, cr.port);
+        synchronized(this.activeCleaningRobots) {
+            this.activeCleaningRobots.forEach(cr -> {
+                this.sendHeartbeat(cr);
             });
         }
     }
