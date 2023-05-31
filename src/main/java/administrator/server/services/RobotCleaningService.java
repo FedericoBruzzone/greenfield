@@ -16,11 +16,11 @@ import javax.ws.rs.core.Response;
 @Path("robot")
 public class RobotCleaningService {
 
-    @GET
-    @Produces({"application/json", "application/xml"})
-    public Response getCleaningRobotsList(){
-        return Response.ok(CommonCleaningRobots.getInstance()).build();
-    }
+    // @GET
+    // @Produces({"application/json", "application/xml"})
+    // public Response getCleaningRobotsList(){
+    //     return Response.ok(CommonCleaningRobots.getInstance()).build();
+    // }
 
     @Path("add")
     @POST

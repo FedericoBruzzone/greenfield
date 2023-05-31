@@ -96,7 +96,20 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
         return !cleaningRobotsList.stream().anyMatch(cleaningRobot -> cleaningRobot.getId() == ID);
     }
     
-    public synchronized void addMeasurementWithId(int id, ArrayList<Double> measurements) {
-        measurementsMap.put(id, measurements);
+    public synchronized void addMeasurementWithId(int robotId, ArrayList<Double> measurements) {
+        if (!measurementsMap.containsKey(robotId)) {
+            measurementsMap.put(robotId, new ArrayList<Double>());
+        }
+        measurementsMap.get(robotId).addAll(0, measurements);
+    }
+
+    public synchronized float getAverageOfLastNAirPollutionLevelsOfRobot(int robotId, int number) {
+        if (!measurementsMap.containsKey(robotId)) {
+            return 0.0f;
+        }
+        if (measurementsMap.get(robotId).size() < number) {
+            return 0.0f;
+        }
+        return measurementsMap.get(robotId).stream().limit(number).reduce(0.0, (a, b) -> a + b).floatValue() / number;
     }
 }

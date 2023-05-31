@@ -86,7 +86,7 @@ public class CleaningRobot implements ICleaningRobot {
         this.slidingWindow = new SlidingWindow(
                 Integer.valueOf(this.configurationHandler.getSlidingWindowSize()),
                 Integer.valueOf(this.configurationHandler.getSlidingWindowOverlap())
-                );
+        );
         this.mqttAsyncClient = MqttClientFactory.createMqttClient();
         this.mqttClientHandler = new MqttClientHandler(mqttAsyncClient);
         this.measurementStream = new MeasurementStream();
@@ -367,9 +367,9 @@ public class CleaningRobot implements ICleaningRobot {
 
     private static void printMenu() {
         System.out.println("Type:\n" +
-                               "\t- 0 crash\n" +
-                               "\t- 1 quit\n" +
-                               "\t- 2 fix\n");
+                               "\t- 0 Crash\n" +
+                               "\t- 1 Quit\n" +
+                               "\t- 2 Fix\n");
     }
 
     public static void main(String[] args) {
@@ -383,21 +383,22 @@ public class CleaningRobot implements ICleaningRobot {
             
 
             int choice;
+            printMenu();
             while(true) { 
-                printMenu();
 
+                System.out.println("Insert your choice: ");
                 BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
                 try {
                     choice = Integer.parseInt(inFromUser.readLine());
                     switch (choice) {
                         case 0:
-                            System.out.println("crash");
+                            System.out.println("\tCrash");
                             System.exit(1);
                         case 1:
-                            System.out.println("quit");
+                            System.out.println("\tQuit");
                             cleaningRobot.systemExit0();
                         case 2:
-                            System.out.println("fix");
+                            System.out.println("\tFix");
                             // TODO
                             break;
                         default:
