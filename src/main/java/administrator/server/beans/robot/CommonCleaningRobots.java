@@ -14,8 +14,6 @@ import common.CommonCleaningRobot;
 
 /**
  * This class is a singleton class that contains a list of CommonCleaningRobot objects.
- *
- * @author: Federico Cristiano Bruzzone
  */
 @XmlRootElement
 @XmlAccessorType(value = XmlAccessType.FIELD)
@@ -158,7 +156,7 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
      * This method adds a measurement to the map of measurements of the specified robot.
      *
      * @param robotId the ID of the robot
-     * @param measurement the measurement to add
+     * @param measurements the measurements to add
      */
     public synchronized void addMeasurementWithId(int robotId, ArrayList<Measurement> measurements) {
         if (!measurementsMap.containsKey(robotId)) {

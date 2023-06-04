@@ -14,8 +14,6 @@ import util.RestHandler;
 
 /**
  * The Class AdministratorClient.
- *
- * @author: Federico Cristiano Bruzzone
  */
 public final class AdministratorClient implements IAdministratorClient  {
 
