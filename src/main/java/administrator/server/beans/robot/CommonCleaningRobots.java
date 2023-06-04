@@ -3,32 +3,40 @@ package administrator.server.beans.robot;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
-import java.util.Collections;
 import java.util.HashMap;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.google.api.SystemParameter;
-
-import common.ICommonCleaningRobot;
+import simulator.Measurement;
 import common.CommonCleaningRobot;
 
+/**
+ * This class is a singleton class that contains a list of CommonCleaningRobot objects.
+ *
+ * @author: Federico Cristiano Bruzzone
+ */
 @XmlRootElement
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public final class CommonCleaningRobots implements ICommonCleaningRobots {
     
     private static CommonCleaningRobots instance;
     private List<CommonCleaningRobot> cleaningRobotsList;
-    private HashMap<Integer, ArrayList<Double>> measurementsMap;
-
+    private HashMap<Integer, ArrayList<Measurement>> measurementsMap;
+    
+    /**
+     * It is private to prevent the instantiation of the class from outside the class itself.
+     */
     private CommonCleaningRobots() {
         cleaningRobotsList = new ArrayList<CommonCleaningRobot>();
-        measurementsMap = new HashMap<Integer, ArrayList<Double>>();
+        measurementsMap = new HashMap<Integer, ArrayList<Measurement>>();
     }
-
+    
+    /**
+     * This method returns the instance of the class.
+     * @return the instance of the class
+     */
     public static CommonCleaningRobots getInstance() {
        if (instance == null) {
             synchronized (CommonCleaningRobots.class) {
@@ -39,7 +47,13 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
         }
         return instance;
     }
-   
+  
+    /**
+     * This method adds a CommonCleaningRobot object to the list.
+     *
+     * @param cleaningRobot the CommonCleaningRobot object to add
+     * @return the CommonCleaningRobot object added
+     */
     public synchronized CommonCleaningRobot add(CommonCleaningRobot cleaningRobot) {
         if (!checkID(cleaningRobot.getId())) {
             // throw new RuntimeException("Failed: There is another Cleaning Robot with this ID "+cleaningRobot.getId());
@@ -49,7 +63,13 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
         cleaningRobotsList.add(cleaningRobot);
         return cleaningRobot;
     }
-    
+   
+    /**
+     * This method removes a CommonCleaningRobot object from the list.
+     *
+     * @param cleaningRobot the CommonCleaningRobot object to remove
+     * @return true if the CommonCleaningRobot object has been removed, false otherwise
+     */
     public synchronized Boolean remove(CommonCleaningRobot cleaningRobot) {
         if (cleaningRobot == null) {
             return false;
@@ -57,13 +77,24 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
         cleaningRobotsList.removeIf(cr -> cr.getId() == cleaningRobot.getId());
         return true;
     }
-
+    
+    /**
+     * This method returns the list of active CommonCleaningRobot.
+     *
+     * @return the list of active CommonCleaningRobot
+     */
     public synchronized List<CommonCleaningRobot> getCleaningRobots() {
         if (cleaningRobotsList != null)
             return new ArrayList<CommonCleaningRobot>(cleaningRobotsList);
         return null;
     }
-   
+  
+    /** 
+     * This method returns the list of CommonCleaningRobot without the specified commonCleaningRobot.
+     *
+     * @param commonCleaningRobot the CommonCleaningRobot object to exclude
+     * @return the list of CommonCleaningRobot without the specified commonCleaningRobot
+     */
     public synchronized List<CommonCleaningRobot> getCleaningRobotsWithout(CommonCleaningRobot commonCleaningRobot) {
         if (cleaningRobotsList != null && commonCleaningRobot != null)
             return new ArrayList<CommonCleaningRobot>(cleaningRobotsList.stream()
@@ -72,6 +103,11 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
         return null;
     }
 
+    /**
+     * This method return the district number with less cleaning robots.
+     *
+     * @return the district number with less cleaning robots
+     */
     public int buildDistrict() {
         return CommonCleaningRobots.getInstance()
                                    .getDistricts()
@@ -80,6 +116,11 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
                                    .intValue() % 4;
     }
 
+    /**
+     * This method returns the list of districts.
+     *
+     * @return the list of districts
+     */
     public List<Integer> getDistricts() {
         return cleaningRobotsList.stream()
                                  .map(cleaningRobot -> cleaningRobot.getDistrict())
@@ -87,22 +128,52 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
                                  .collect(Collectors.toList());    
     }
 
+    /**
+     * This method set the list of CommonCleaningRobot.
+     *
+     * @param cleaningRobotsList the list of CommonCleaningRobot to set
+     */
     public synchronized void setCleaningRobots(List<CommonCleaningRobot> cleaningRobotsList) {
-        // check if all ID are unique
+        // check if there are duplicate in parameter cleaningRobotsList
+        if (cleaningRobotsList.stream()
+                              .anyMatch(cleaningRobot -> cleaningRobotsList.stream()
+                                                                           .filter(cr -> cr.getId() == cleaningRobot.getId())
+                                                                           .count() > 1)) {
+            throw new RuntimeException("Failed: There are duplicate Cleaning Robots in the list");
+        }
         this.cleaningRobotsList = cleaningRobotsList;
     }
-    
+   
+    /**
+     * This method checks if there is another CommonCleaningRobot with the same ID.
+     *
+     * @param ID the ID to check
+     * @return true if there is not another CommonCleaningRobot with the same ID, false otherwise
+     */
     private boolean checkID(int ID) {
         return !cleaningRobotsList.stream().anyMatch(cleaningRobot -> cleaningRobot.getId() == ID);
     }
-    
-    public synchronized void addMeasurementWithId(int robotId, ArrayList<Double> measurements) {
+   
+    /**
+     * This method adds a measurement to the map of measurements of the specified robot.
+     *
+     * @param robotId the ID of the robot
+     * @param measurement the measurement to add
+     */
+    public synchronized void addMeasurementWithId(int robotId, ArrayList<Measurement> measurements) {
         if (!measurementsMap.containsKey(robotId)) {
-            measurementsMap.put(robotId, new ArrayList<Double>());
+            measurementsMap.put(robotId, new ArrayList<Measurement>());
         }
         measurementsMap.get(robotId).addAll(0, measurements);
     }
-
+    
+    /**
+     * This method returns the average of the first n measurements of the specified robot.
+     *
+     * @param robotId the ID of the robot
+     * @param number the number of measurements to consider
+     * @return the average of the first n measurements of the specified robot
+     */
     public synchronized float getAverageOfLastNAirPollutionLevelsOfRobot(int robotId, int number) {
         if (!measurementsMap.containsKey(robotId)) {
             return 0.0f;
@@ -110,6 +181,37 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
         if (measurementsMap.get(robotId).size() < number) {
             return 0.0f;
         }
-        return measurementsMap.get(robotId).stream().limit(number).reduce(0.0, (a, b) -> a + b).floatValue() / number;
+
+        return measurementsMap.get(robotId)
+                              .stream()
+                              .limit(number)
+                              .map(measurement -> measurement.getValue())
+                              .reduce(0.0, (a, b) -> a + b)
+                              .floatValue() / number;
     }
+
+    /**
+     * This method returns the average of the measurements of all robots between the specified timestamps.
+     *
+     * @param from the starting timestamp
+     * @param to the ending timestamp
+     * @return the average of the measurements of all robots between the specified timestamps
+     */
+    public synchronized float getAverageOfAirPollutionLevelsOfAllRobotsBetween(long from, long to) {
+        if (measurementsMap.isEmpty()) {
+            return 0.0f;
+        }
+        return measurementsMap.values()
+                              .stream()
+                              .flatMap(measurements -> measurements.stream())
+                              .filter(measurement -> measurement.getTimestamp() >= from && measurement.getTimestamp() <= to)
+                              .map(measurement -> measurement.getValue())
+                              .reduce(0.0, (a, b) -> a + b)
+                              .floatValue() / measurementsMap.values()
+                                                             .stream()
+                                                             .flatMap(measurements -> measurements.stream())
+                                                             .filter(measurement -> measurement.getTimestamp() >= from && measurement.getTimestamp() <= to)
+                                                             .count(); 
+    }
+
 }

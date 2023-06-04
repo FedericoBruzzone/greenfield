@@ -204,7 +204,8 @@ public class CleaningRobot implements ICleaningRobot {
     
     public void createComputeAverageThread() {
         this.computeAverageThread = new ComputeAverageThread(this.slidingWindow, 
-                                                             this.measurementStream);
+                                                             this.measurementStream,
+                                                             this);
     }
 
     public void createSendAverageThread() {

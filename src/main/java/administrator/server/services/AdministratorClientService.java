@@ -22,8 +22,15 @@ public class AdministratorClientService {
     @Path("/averageoflastnairpollutionlevelsofrobot")
     @GET
     @Produces({"application/json", "application/xml"})
-    public Response getAverageOfLastNAirPollutionLevelsOfRobot(@QueryParam("robotId") int robotId, @QueryParam("numberOfLast") int numberOfLast){
-        return Response.ok(CommonCleaningRobots.getInstance().getAverageOfLastNAirPollutionLevelsOfRobot(robotId, numberOfLast)).build();
+    public Response getAverageOfLastNAirPollutionLevelsOfRobot(@QueryParam("robotId") int robotId, @QueryParam("n") int n){
+        return Response.ok(CommonCleaningRobots.getInstance().getAverageOfLastNAirPollutionLevelsOfRobot(robotId, n)).build();
+    }
+
+    @Path("/averageofairpollutionlevelsofallrobotsbetween")
+    @GET
+    @Produces({"application/json", "application/xml"})
+    public Response getAverageOfAirPollutionLevelsOfAllRobotsBetween(@QueryParam("from") long from, @QueryParam("to") long to){
+        return Response.ok(CommonCleaningRobots.getInstance().getAverageOfAirPollutionLevelsOfAllRobotsBetween(from, to)).build();
     }
 
     @GET

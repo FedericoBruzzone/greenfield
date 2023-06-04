@@ -2,6 +2,7 @@ package util;
 
 import util.ConfigurationHandler;
 import administrator.server.beans.robot.CommonCleaningRobots;
+import simulator.Measurement;
 
 import java.sql.Timestamp;
 import java.util.ArrayList; 
@@ -62,7 +63,7 @@ public class MqttClientHandler {
                    
                 MqttMessageAverageId measurementStream = gson.fromJson(receivedMessage, MqttMessageAverageId.class);
 
-                ArrayList<Double> measurementList = measurementStream.getMeasurementList(); 
+                ArrayList<Measurement> measurementList = measurementStream.getMeasurementList(); 
                 int id = measurementStream.getId();
                 CommonCleaningRobots.getInstance().addMeasurementWithId(id, measurementList);
 
@@ -77,7 +78,6 @@ public class MqttClientHandler {
             @Override
             public void connectionLost(Throwable cause) {
                 System.out.println(client.getClientId() + " Connection lost! cause:" + cause.getMessage()+ "-  Thread PID: " + Thread.currentThread().getId());
-                // System.out.println("Connection lost");
             }
         });
 

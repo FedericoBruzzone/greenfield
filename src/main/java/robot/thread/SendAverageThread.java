@@ -3,6 +3,7 @@ package robot.thread;
 import robot.thread.MeasurementStream;
 import util.MqttClientHandler;
 import util.MqttMessageAverageId;
+import simulator.Measurement;
 
 import com.google.gson.Gson;
 
@@ -10,8 +11,6 @@ import java.lang.Thread;
 import java.util.ArrayList;
 
 public class SendAverageThread extends Thread {
-    // Send to the Administrator Server the list of average values
-   
     private MeasurementStream measurementStream;
     private MqttClientHandler mqttClientHandler;
     private int district;
@@ -36,7 +35,7 @@ public class SendAverageThread extends Thread {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            ArrayList<Double> measurementList = measurementStream.getAndClean();
+            ArrayList<Measurement> measurementList = measurementStream.getAndClean();
             MqttMessageAverageId mqttMessageAverageId = new MqttMessageAverageId(measurementList, this.id);
 
             String measurementStreamJson = gson.toJson(mqttMessageAverageId); 

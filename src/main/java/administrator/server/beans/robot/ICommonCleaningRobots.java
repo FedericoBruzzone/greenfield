@@ -3,7 +3,7 @@ package administrator.server.beans.robot;
 import java.util.List;
 import java.util.ArrayList;
 
-import common.ICommonCleaningRobot;
+import simulator.Measurement;
 import common.CommonCleaningRobot;
 
 public interface ICommonCleaningRobots {
@@ -13,5 +13,5 @@ public interface ICommonCleaningRobots {
     public Boolean remove(CommonCleaningRobot cleaningRobot);
     public List<Integer> getDistricts();
     public void setCleaningRobots(List<CommonCleaningRobot> cleaningRobots);
-    public void addMeasurementWithId(int id, ArrayList<Double> measurements);
+    public void addMeasurementWithId(int id, ArrayList<Measurement> measurements);
 }

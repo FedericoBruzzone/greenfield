@@ -67,7 +67,6 @@ public class SlidingWindow implements Buffer {
      * @return the last <code>size</code> measurements
      */
     public synchronized List<Measurement> readAllAndClean() {
-        // System.out.println("[SlidingWindow] readAllAndClean");
         while (this.queue.size() < this.size) {
             try {
                 this.wait();

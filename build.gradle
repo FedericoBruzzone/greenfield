@@ -6,6 +6,7 @@ plugins {
     id "application"
 //    id "io.freefair.aspectj" version "6.4.1"
     id "io.freefair.aspectj.post-compile-weaving" version "6.4.1"
+
 }
 
 group 'org.example'
@@ -14,7 +15,6 @@ version '1.0-SNAPSHOT'
 repositories {
     mavenCentral()
 }
-
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
@@ -28,7 +28,7 @@ dependencies {
     implementation group: 'io.grpc', name: 'grpc-all', version: '1.25.0'
 
     implementation 'com.google.code.gson:gson:2.7'
-
+    
     // REST Dependencies
     // https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-core-asl
     implementation group: 'org.codehaus.jackson', name: 'jackson-core-asl', version: '1.9.2'
@@ -65,21 +65,6 @@ dependencies {
     implementation 'org.aspectj:aspectjweaver:1.9.6' // 8
 
 }
-
-// run {
-//     main = "Main" 
-// }
-
-//AspectJ
-// configurations {
-//     ajc
-//     aspects
-//     aspectCompile
-//     compile{
-//         extendsFrom aspects
-//     }
-// }
-
 
 // AspectJ
 compileJava.ajc.options.compilerArgs = ["-sourceroots", "../../../src/main/aspectj"]
@@ -150,20 +135,3 @@ task runCleaningRobotClient(type: JavaExec) {
     standardInput = System.in // enable standardInput
 }
 
-// task runS(type: JavaExec) {
-//     group = "Execution"
-//     description = ""
-//     classpath = sourceSets.main.runtimeClasspath
-//     main = 'sum.App'
-//     // args '1234'
-//     standardInput = System.in // enable standardInput
-// }
-
-// task runC(type: JavaExec) {
-//     group = "Execution"
-//     description = ""
-//     classpath = sourceSets.main.runtimeClasspath
-//     main = 'sum.SumServiceClient'
-//     // args('localhost', '6789') // main args
-//     standardInput = System.in // enable standardInput
-// }

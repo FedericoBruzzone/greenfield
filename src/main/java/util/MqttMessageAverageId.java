@@ -2,17 +2,19 @@ package util;
 
 import java.util.ArrayList;
 
+import simulator.Measurement;
+
 public class MqttMessageAverageId {
-    private ArrayList<Double> measurementList;
+    private ArrayList<Measurement> measurementList;
     private int id;
 
-    public MqttMessageAverageId(ArrayList<Double> measurementList, int id) {
+    public MqttMessageAverageId(ArrayList<Measurement> measurementList, int id) {
         this.measurementList = measurementList;
         this.id = id;
     }
 
-    public ArrayList<Double> getMeasurementList() {
-        return this.measurementList;
+    public ArrayList<Measurement> getMeasurementList() {
+        return new ArrayList<Measurement>(this.measurementList);
     }
 
     public int getId() {
