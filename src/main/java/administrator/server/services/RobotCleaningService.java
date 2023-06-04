@@ -2,26 +2,30 @@ package administrator.server.services;
 
 import common.CommonCleaningRobot;
 import administrator.server.beans.robot.CommonCleaningRobots;
-import common.ICommonCleaningRobot;
-import common.response.IResponse;
 import common.response.RobotAddResponse;
-import administrator.server.beans.robot.ICommonCleaningRobots;
-
-import java.util.List;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
-
+/**
+ * This class is the REST service for the cleaning robots.<br>
+ * It provides the following services:<br>
+ * - add a new cleaning robot to the system<br>
+ * - remove a cleaning robot from the system<br>
+ */
 @Path("robot")
 public class RobotCleaningService {
 
-    // @GET
-    // @Produces({"application/json", "application/xml"})
-    // public Response getCleaningRobotsList(){
-    //     return Response.ok(CommonCleaningRobots.getInstance()).build();
-    // }
-
+    /**
+     * Add a new cleaning robot to the system.<br>
+     * Path: /robot/add<br>
+     * Method: POST<br>
+     * Consumes: application/json, application/xml<br>
+     * Produces: application/json, application/xml<br>
+     *
+     * @param cleaningRobot the cleaning robot to add
+     * @return a rest response if the cleaning robot is added or not.
+     */
     @Path("add")
     @POST
     @Consumes({"application/json", "application/xml"})
@@ -36,7 +40,16 @@ public class RobotCleaningService {
         System.out.println("/robot/add " + cleaningRobot);
         return Response.ok(robotAddResponse).build();
     }
-    
+   
+    /**
+     * Remove a cleaning robot from the system.<br>
+     * Path: /robot/remove<br>
+     * Method: DELETE<br>
+     * Consumes: application/json, application/xml<br>
+     *
+     * @param cleaningRobot the cleaning robot to remove 
+     * @return a rest response if the cleaning robot is removed or not.
+     */
     @Path("remove")
     @DELETE
     @Consumes({"application/json", "application/xml"})
@@ -49,18 +62,5 @@ public class RobotCleaningService {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
-
-    ////permette di prelevare un utente con un determinato nome
-    //@Path("get/{name}")
-    //@GET
-    //@Produces({"application/json", "application/xml"})
-    //public Response getByName(@PathParam("name") String name){
-    //    User u = Users.getInstance().getByName(name);
-    //    if(u!=null)
-    //        return Response.ok(u).build();
-    //    else
-    //        return Response.status(Response.Status.NOT_FOUND).build();
-    //}
-
 
 }

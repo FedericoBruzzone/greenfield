@@ -14,18 +14,27 @@ import util.RestHandler;
 
 /**
  * The Class AdministratorClient.
+ *
  */
 public final class AdministratorClient implements IAdministratorClient  {
 
+    private Client client;
+    private String baseUri;
+    
+    /**
+     * Constructs a new administrator client.
+     */
+    public AdministratorClient() {
+        this.client = new Client();
+        this.baseUri = ConfigurationHandler.getInstance().getEndpointAdministratorServer();
+    }
+
     /**
      * This method is used to get the list of the cleaning robots currently located in Greenfield.
-     *
-     * @param client the client
-     * @param baseUri the base uri
      */
-    private static void getCleaningRobotsList(Client client, String baseUri) {
+    private void getCleaningRobotsList() {
         String getPath = "/administratorclient/cleaningrobotslist";
-        ClientResponse clientResponse = RestHandler.getRequest(client, baseUri + getPath);
+        ClientResponse clientResponse = RestHandler.getRequest(this.client, this.baseUri + getPath);
         String string = clientResponse.getEntity(String.class);
         System.out.println(string);
     }
@@ -33,14 +42,12 @@ public final class AdministratorClient implements IAdministratorClient  {
     /**
      * This method is used to get the average of the last n air pollution levels sent to the server by a given robot.
      *
-     * @param client the client
-     * @param baseUri the base uri
      * @param robotId the robot id
      * @param n the number of last n air pollution levels
      */
-    private static void getAverageOfLastNAirPollutionLevelsOfRobot(Client client, String baseUri, int robotId, int n) {
+    private void getAverageOfLastNAirPollutionLevelsOfRobot( int robotId, int n) {
         String getPath = "/administratorclient/averageoflastnairpollutionlevelsofrobot?robotId="+robotId+"&n="+n;
-        ClientResponse clientResponse = RestHandler.getRequest(client, baseUri + getPath);
+        ClientResponse clientResponse = RestHandler.getRequest(this.client, this.baseUri + getPath);
         String string = clientResponse.getEntity(String.class);
         System.out.println(string);
     }
@@ -48,14 +55,12 @@ public final class AdministratorClient implements IAdministratorClient  {
     /**
      * This method is used to get the average of the air pollution levels sent by all the robots to the server and occurred from timestamps t1 and t2.
      *
-     * @param client the client
-     * @param baseUri the base uri
      * @param from the first timestamp
      * @param to the second timestamp
      */
-    private static void getAverageOfAirPollutionLevelsOfAllRobotsBetween(Client client, String baseUri, long from, long to) {
+    private void getAverageOfAirPollutionLevelsOfAllRobotsBetween(long from, long to) {
         String getPath = "/administratorclient/averageofairpollutionlevelsofallrobotsbetween?from="+from+"&to="+to;
-        ClientResponse clientResponse = RestHandler.getRequest(client, baseUri + getPath);
+        ClientResponse clientResponse = RestHandler.getRequest(this.client, this.baseUri + getPath);
         String string = clientResponse.getEntity(String.class);
         System.out.println(string);
     }
@@ -72,10 +77,9 @@ public final class AdministratorClient implements IAdministratorClient  {
 
     public static void main(String[] args) {
         // Try to use a ClientConfig object to configure the client.
-        Client client = new Client();
-        ConfigurationHandler configurationHandler = ConfigurationHandler.getInstance(); 
-        String baseUri = configurationHandler.getEndpointAdministratorServer();
         
+        AdministratorClient administratorClient = new AdministratorClient();
+
         int choice = 0; 
 
         printMenu();
@@ -86,14 +90,14 @@ public final class AdministratorClient implements IAdministratorClient  {
                 choice = Integer.parseInt(inFromUser.readLine());
                 switch (choice) {
                     case 0:
-                        getCleaningRobotsList(client, baseUri); 
+                        administratorClient.getCleaningRobotsList(); 
                         break;
                     case 1:
                         System.out.print("\tInsert the robot id: ");
                         int robotId = Integer.parseInt(inFromUser.readLine());
                         System.out.print("\tInsert the number of mesurement: ");
                         int numberOfLast = Integer.parseInt(inFromUser.readLine());
-                        getAverageOfLastNAirPollutionLevelsOfRobot(client, baseUri, robotId, numberOfLast);
+                        administratorClient.getAverageOfLastNAirPollutionLevelsOfRobot(robotId, numberOfLast);
                         break;
                     case 2:
                         // "2023/06/04 18:10:45"
@@ -102,7 +106,7 @@ public final class AdministratorClient implements IAdministratorClient  {
                         long from = sdf.parse(inFromUser.readLine()).getTime();
                         System.out.print("\tInsert the second timestamp (yyyy/MM/dd HH:mm:ss) [to]: ");
                         long to = sdf.parse(inFromUser.readLine()).getTime();
-                        getAverageOfAirPollutionLevelsOfAllRobotsBetween(client, baseUri, from, to);
+                        administratorClient.getAverageOfAirPollutionLevelsOfAllRobotsBetween(from, to);
                         break;
                     default:
                         System.out.println("\tThis choice is not available.");

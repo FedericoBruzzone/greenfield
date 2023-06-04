@@ -1,5 +1,7 @@
 package administrator.server;
 
+import java.io.IOException;
+
 import administrator.IAdministratorServer;
 import util.ConfigurationHandler; 
 import util.MqttClientFactory;
@@ -7,17 +9,21 @@ import util.MqttClientHandler;
 
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.net.httpserver.HttpServer;
-import java.io.IOException;
-
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 
+/**
+ * This class is responsible for starting the HTTP server and subscribing to the MQTT topics.
+ */
 public final class AdministratorServer implements IAdministratorServer {
     private ConfigurationHandler configurationHandler;
     private String serverURI;
     private HttpServer httpServer;
     private MqttAsyncClient client;
     private MqttClientHandler mqttClientHandler;
-
+    
+    /**
+     * Constructs a new AdministratorServer object.
+     */
     public AdministratorServer() {
         this.configurationHandler = ConfigurationHandler.getInstance();
         this.serverURI = configurationHandler.getEndpointAdministratorServer();
@@ -25,7 +31,10 @@ public final class AdministratorServer implements IAdministratorServer {
         this.client = MqttClientFactory.createMqttClient();
         this.mqttClientHandler = new MqttClientHandler(client);
     }
-   
+    
+    /**
+     * Creates a new HTTP server.
+     */
     public void createHttpServer() {
         try {
             this.httpServer = HttpServerFactory.create(serverURI + "/");
@@ -33,14 +42,20 @@ public final class AdministratorServer implements IAdministratorServer {
             e.printStackTrace();
         }
     }
-
+    
+    /**
+     * Subscribes to the MQTT topics.
+     */
     private void subscribeToDistricts() {
         this.mqttClientHandler.subscribeToDistrict("0");
         this.mqttClientHandler.subscribeToDistrict("1");
         this.mqttClientHandler.subscribeToDistrict("2");
         this.mqttClientHandler.subscribeToDistrict("3");
     }
-    
+   
+    /**
+     * Starts the HTTP server.
+     */
     public void startHttpServer() {
         try {
             httpServer.start();
