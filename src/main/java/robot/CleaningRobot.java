@@ -3,7 +3,6 @@ package robot;
 import util.ConfigurationHandler;
 import util.MqttClientFactory;
 import util.MqttClientHandler;
-import common.response.IResponse;
 import common.response.RobotAddResponse;
 import simulator.SlidingWindow;
 import simulator.PM10Simulator;
@@ -25,11 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient; 
 
 import io.grpc.Server;
@@ -140,7 +136,13 @@ public class CleaningRobot implements ICleaningRobot {
     public void removeUnactiveCleaningRobot(CleaningRobotInfo cleaningRobotInfo) {
         synchronized(this.activeCleaningRobots) {
             this.activeCleaningRobots.removeIf(cr -> cr.id == cleaningRobotInfo.id);
-            // this.activeCleaningRobots.remove(cleaningRobotInfo);
+            System.out.println("Active cleaning robot: " + this.activeCleaningRobots);
+        }
+    }
+
+    public void removeUnactiveCleaningRobot(int cleaningRobotId) {
+        synchronized(this.activeCleaningRobots) {
+            this.activeCleaningRobots.removeIf(cr -> cr.id == cleaningRobotId);
             System.out.println("Active cleaning robot: " + this.activeCleaningRobots);
         }
     }
@@ -303,6 +305,14 @@ public class CleaningRobot implements ICleaningRobot {
         }
     }
 
+    public void sendHeartbeatCrash(CleaningRobotInfo cleaningRobotInfo, int cleaningRobotIdCrashed) {
+        try {
+            HeartbeatServiceClient.asynchronousStreamCallCrash(cleaningRobotInfo, cleaningRobotIdCrashed);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    } 
+
     public void sendHeartbeatToAll() {
         synchronized(this.activeCleaningRobots) {
             this.activeCleaningRobots.forEach(cr -> {
@@ -310,6 +320,14 @@ public class CleaningRobot implements ICleaningRobot {
             });
         }
     }
+
+    public void sendHeartbeatCrashToAll(int cleaningRobotIdCrashed) {
+        synchronized(this.activeCleaningRobots) {
+            this.activeCleaningRobots.forEach(cr -> {
+                this.sendHeartbeatCrash(cr, cleaningRobotIdCrashed);
+            });
+        }
+    }    
 
     public void createHeartbeatThread() {
         this.heartbeatThread = new HeartbeatThread(this);
@@ -349,7 +367,6 @@ public class CleaningRobot implements ICleaningRobot {
 
     public void systemExit0() {
         // TODO complete any operation at the mechanic 
-        System.out.println("CleaningRobot " + this.getId() + " is going to exit");
         this.removeFromAdministratorServer();
         this.sendGoodbyeToAll(); 
         this.stopAllThreads();

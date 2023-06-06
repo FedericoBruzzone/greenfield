@@ -18,7 +18,8 @@ public interface ICleaningRobot {
     public void registerToAdministratorServer(); 
     public void removeFromAdministratorServer(); 
     public void removeCleaningRobotFromAdministratorServer(CleaningRobotInfo cleaningRobotInfo);
-
+    public void removeUnactiveCleaningRobot(int cleaningRobotId);
+    
     public void createPm10Simulator();
     public void createComputeAverageThread();
     public void createSendAverageThread();
@@ -37,11 +38,14 @@ public interface ICleaningRobot {
     public void sendGoodbye(CleaningRobotInfo cleaningRobotInfo);
     public void sendGoodbyeToAll();
     public void sendHeartbeat(CleaningRobotInfo cleaningRobotInfo);
+    public void sendHeartbeatCrash(CleaningRobotInfo cleaningRobotInfo, int cleaningRobotIdCrashed); 
     public void sendHeartbeatToAll();
+    public void sendHeartbeatCrashToAll(int cleaningRobotIdCrashed);
     public void createHeartbeatThread();
     public void startHeartbeatThread();
     public void stopHeartbeatThread();
     
+
     public void createAllThreads();
     public void startAllThreads();
     public void stopAllThreads();

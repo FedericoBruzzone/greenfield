@@ -72,8 +72,9 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
         if (cleaningRobot == null) {
             return false;
         }
+        int lengthCleaningRobotsList = cleaningRobotsList.size();
         cleaningRobotsList.removeIf(cr -> cr.getId() == cleaningRobot.getId());
-        return true;
+        return lengthCleaningRobotsList - 1 == cleaningRobotsList.size();
     }
     
     /**

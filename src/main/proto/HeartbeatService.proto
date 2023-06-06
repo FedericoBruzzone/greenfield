@@ -14,8 +14,17 @@ message HeartbeatResponse {
     int32 id = 1;
 }
 
+message CrashRequest {
+    int32 id = 1;
+}
+
+message CrashResponse {
+    int32 id = 1;
+}
 
 service HeartbeatService {
     rpc heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
     rpc streamHeartbeat(HeartbeatRequest) returns (stream HeartbeatResponse);
+    rpc crash(CrashRequest) returns (CrashResponse);
+    rpc streamCrash(CrashRequest) returns (stream CrashResponse);
 }

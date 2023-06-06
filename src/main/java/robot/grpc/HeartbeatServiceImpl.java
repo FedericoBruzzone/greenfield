@@ -23,4 +23,13 @@ public class HeartbeatServiceImpl extends HeartbeatServiceImplBase {
         // responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void streamCrash(CrashRequest request, StreamObserver<CrashResponse> responseObserver) {
+        int cleaningRobotToRemove = request.getId();
+        this.cleaningRobot.removeUnactiveCleaningRobot(cleaningRobotToRemove);
+        // responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+     
 }

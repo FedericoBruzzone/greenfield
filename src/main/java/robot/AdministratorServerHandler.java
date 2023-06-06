@@ -32,7 +32,8 @@ public class AdministratorServerHandler {
                                                                           cleaningRobot.getPort());        
         ClientResponse clientResponse = RestHandler.deleteRequest(client, administratorServerURI+"/robot/remove", commonCleaningRobot);
         if (clientResponse.getStatus() != 200) {
-            throw new RuntimeException("Failed [" +clientResponse.getStatus()+ "]: There is no Cleaning Robot with this ID ");
+            // throw new RuntimeException("Failed [" +clientResponse.getStatus()+ "]: There is no Cleaning Robot with this ID ");
+            System.out.println("Failed [" +clientResponse.getStatus()+ "]: There is no Cleaning Robot with this ID ");
         }
         return clientResponse;
     }
@@ -43,7 +44,7 @@ public class AdministratorServerHandler {
                                                                           cleaningRobotInfo.port);        
         ClientResponse clientResponse = RestHandler.deleteRequest(client, administratorServerURI+"/robot/remove", commonCleaningRobot);
         if (clientResponse.getStatus() != 200) {
-            throw new RuntimeException("Failed [" +clientResponse.getStatus()+ "]: There is no Cleaning Robot with this ID ");
+            System.out.println("Failed [" +clientResponse.getStatus()+ "]: There is no Cleaning Robot with this ID ");
         }
         return clientResponse;
     }
