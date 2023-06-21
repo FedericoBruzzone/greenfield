@@ -12,7 +12,21 @@ public interface ICleaningRobot {
     public List<CleaningRobotInfo> getActiveCleaningRobots();
     public void addActiveCleaningRobot(CleaningRobotInfo cleaningRobotInfo);
     public void removeUnactiveCleaningRobot(CleaningRobotInfo cleaningRobotInfo);
-    
+
+    public void setIsBroken(Boolean isBroken); 
+    public Boolean getIsBroken(); 
+    public void setMyTimestampRequestImBroken(long timestamp); 
+    public long getMyTimestampRequestImBroken(); 
+    public void sendImBroken(CleaningRobotInfo cleaningRobotInfo, CleaningRobotInfo myTimestampRequestImBroken); 
+    public void sendImBrokenToAll(); 
+    public void createMalfunctionsThread(); 
+    public void startMalfunctionsThread(); 
+    public void stopMalfunctionsThread(); 
+    public void addCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo); 
+    public void removeCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo); 
+    public void removeAllCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo); 
+    public void setResponseCleaningRobotsISentThatImBroken(CleaningRobotInfo cleaningRobotInfo, Boolean response); 
+
     public void setAdministratorServerHandler(Client client, String serverURI);
     public void setAdministratorServerHandler(AdministratorServerHandler administratorServerHandler);
     public void registerToAdministratorServer(); 
@@ -45,7 +59,6 @@ public interface ICleaningRobot {
     public void startHeartbeatThread();
     public void stopHeartbeatThread();
     
-
     public void createAllThreads();
     public void startAllThreads();
     public void stopAllThreads();

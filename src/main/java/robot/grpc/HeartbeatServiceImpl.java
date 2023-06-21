@@ -5,7 +5,6 @@ import proto.grpc.HeartbeatServiceOuterClass.*;
 import io.grpc.stub.StreamObserver;
 
 import robot.CleaningRobot;
-import robot.CleaningRobotInfo;
 
 public class HeartbeatServiceImpl extends HeartbeatServiceImplBase {
     private CleaningRobot cleaningRobot;

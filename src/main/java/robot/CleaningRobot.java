@@ -8,6 +8,7 @@ import simulator.SlidingWindow;
 import simulator.PM10Simulator;
 import robot.thread.ComputeAverageThread;
 import robot.thread.HeartbeatThread;
+import robot.thread.MalfunctionsThread;
 import robot.thread.SendAverageThread;
 import robot.thread.MeasurementStream; 
 import robot.grpc.GreetingServiceImpl;
@@ -16,11 +17,14 @@ import robot.grpc.GoodbyeServiceImpl;
 import robot.grpc.GoodbyeServiceClient;
 import robot.grpc.HeartbeatServiceClient;
 import robot.grpc.HeartbeatServiceImpl;
+import robot.grpc.BrokenServiceClient;
+import robot.grpc.BrokenServiceImpl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,6 +43,12 @@ public class CleaningRobot implements ICleaningRobot {
     private String port;
     private int district; 
     private volatile List<CleaningRobotInfo> activeCleaningRobots;
+    
+    private Boolean isBroken;
+    private CleaningRobotInfo myTimestampRequestImBroken;
+    private List<CleaningRobotInfo> cleaningRobotsWithTimestampGreaterThanMine;
+    private HashMap<CleaningRobotInfo, Boolean> responseCleaningRobotsISentThatImBroken;
+    private MalfunctionsThread malfunctionsThread;
 
     private Client client;
     private String administratorServerURI;
@@ -70,9 +80,13 @@ public class CleaningRobot implements ICleaningRobot {
         this.host = this.configurationHandler.getRobotHost(); 
         this.port = String.valueOf(10000 + this.id);
         this.district = -1;
-        // this.activeCleaningRobot = null;
         this.activeCleaningRobots = new ArrayList<CleaningRobotInfo>();
 
+        this.isBroken = false;
+        this.myTimestampRequestImBroken = new CleaningRobotInfo(this.id, this.host, this.port, this.district, -1);
+        this.responseCleaningRobotsISentThatImBroken = new HashMap<CleaningRobotInfo, Boolean>();
+        this.cleaningRobotsWithTimestampGreaterThanMine = new ArrayList<CleaningRobotInfo>();
+        
         // AdministratorServer
         this.client = Client.create();
         this.administratorServerURI = configureAdministratorServerURI(configurationHandler); 
@@ -91,12 +105,11 @@ public class CleaningRobot implements ICleaningRobot {
         // this.greetingServiceClient = new GreetingServiceClient();
         // this.greetingServiceImpl = new GreetingServiceImpl(this);
         this.grpcServer = ServerBuilder.forPort(Integer.valueOf(this.port))
-                                  .addService(new GreetingServiceImpl(this))
-                                  .addService(new GoodbyeServiceImpl(this))
-                                  .addService(new HeartbeatServiceImpl(this))
-                                  .build();
-        
-    
+                                       .addService(new GreetingServiceImpl(this))
+                                       .addService(new GoodbyeServiceImpl(this))
+                                       .addService(new HeartbeatServiceImpl(this))
+                                       .addService(new BrokenServiceImpl(this))
+                                       .build();
     }
     
     ////////////////////////////////////////////////////////////////////////////////
@@ -145,6 +158,102 @@ public class CleaningRobot implements ICleaningRobot {
             this.activeCleaningRobots.removeIf(cr -> cr.id == cleaningRobotId);
             System.out.println("Active cleaning robot: " + this.activeCleaningRobots);
         }
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    // Mechanical                                                                 //
+    ////////////////////////////////////////////////////////////////////////////////
+    public void setIsBroken(Boolean isBroken) {
+        synchronized(this.isBroken) {
+            this.isBroken = isBroken;
+        }
+    }
+
+    public Boolean getIsBroken() {
+        synchronized(this.isBroken) {
+            return this.isBroken;
+        }
+    }
+  
+    public void setMyTimestampRequestImBroken(long timestamp) {
+        synchronized(this.myTimestampRequestImBroken) {
+            this.myTimestampRequestImBroken.timestamp = timestamp;
+        }
+    }
+
+    public long getMyTimestampRequestImBroken() {
+        synchronized(this.myTimestampRequestImBroken) {
+            return this.myTimestampRequestImBroken.timestamp;
+        }
+    }
+    
+    public void addCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo) {
+        synchronized(this.cleaningRobotsWithTimestampGreaterThanMine) {
+            this.cleaningRobotsWithTimestampGreaterThanMine.add(cleaningRobotInfo);
+        }
+    }
+
+    public void removeCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo) {
+        synchronized(this.cleaningRobotsWithTimestampGreaterThanMine) {
+            this.cleaningRobotsWithTimestampGreaterThanMine.removeIf(cr -> cr.id == cleaningRobotInfo.id);
+        }
+    }
+
+    public void removeAllCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo) {
+        synchronized(this.cleaningRobotsWithTimestampGreaterThanMine) {
+            this.cleaningRobotsWithTimestampGreaterThanMine.clear();
+        }
+    } 
+
+    public void setResponseCleaningRobotsISentThatImBroken(CleaningRobotInfo cleaningRobotInfo, Boolean response) {
+        synchronized(this.responseCleaningRobotsISentThatImBroken) {
+            this.responseCleaningRobotsISentThatImBroken.put(cleaningRobotInfo, response);
+        }
+    }
+
+    public HashMap<CleaningRobotInfo, Boolean> getResponseCleaningRobotsISentThatImBroken() {
+        synchronized(this.responseCleaningRobotsISentThatImBroken) {
+            return new HashMap<CleaningRobotInfo, Boolean>(this.responseCleaningRobotsISentThatImBroken);
+        }
+    }
+
+    public void sendImBroken(CleaningRobotInfo cleaningRobotInfo, CleaningRobotInfo myTimestampRequestImBroken) {
+        System.out.println("Cleaning robot " + this.id + " sent to cleaning robot " + cleaningRobotInfo.id + " that it is broken");
+        try {
+            BrokenServiceClient.asynchronousStreamCall(cleaningRobotInfo, this, myTimestampRequestImBroken);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void sendImBrokenToAll() {
+        synchronized(this.activeCleaningRobots) {
+            this.activeCleaningRobots.forEach(cleaningRobotInfo -> {
+                this.responseCleaningRobotsISentThatImBroken.put(cleaningRobotInfo, false);
+            });
+        }
+        long timestamp = System.currentTimeMillis();
+        this.myTimestampRequestImBroken = new CleaningRobotInfo(this.id, 
+                                                                this.host, 
+                                                                this.port, 
+                                                                this.district, 
+                                                                timestamp); 
+        this.responseCleaningRobotsISentThatImBroken.forEach((cleaningRobotInfo, response) -> {
+                sendImBroken(cleaningRobotInfo, myTimestampRequestImBroken);
+        });
+        System.out.println("QUasi alla fine");
+    }
+
+    public void createMalfunctionsThread() {
+        this.malfunctionsThread = new MalfunctionsThread(this);
+    }
+
+    public void startMalfunctionsThread() {
+        this.malfunctionsThread.start();
+    }
+
+    public void stopMalfunctionsThread() {
+        this.malfunctionsThread.stop();
     }
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -349,6 +458,7 @@ public class CleaningRobot implements ICleaningRobot {
         this.createComputeAverageThread();
         this.createSendAverageThread();
         this.createHeartbeatThread();
+        this.createMalfunctionsThread();
     }
 
     public void startAllThreads() {
@@ -356,6 +466,7 @@ public class CleaningRobot implements ICleaningRobot {
         this.startComputeAverageThread();
         this.startSendAverageThread();
         this.startHeartbeatThread();
+        this.startMalfunctionsThread();
     }
 
     public void stopAllThreads() {
@@ -363,6 +474,7 @@ public class CleaningRobot implements ICleaningRobot {
         this.stopComputeAverageThread();
         this.stopSendAverageThread();
         this.stopHeartbeatThread();
+        this.stopMalfunctionsThread();
     }
 
     public void systemExit0() {

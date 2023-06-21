@@ -1,0 +1,20 @@
+syntax = "proto3";
+package proto.grpc;
+
+message BrokenRequest {
+    int32 id = 1;
+    string host = 2;
+    string port = 3;
+    int32 district = 4;
+    int64 timestamp = 5;
+}
+
+message BrokenResponse {
+    string message = 1;
+}
+
+service BrokenService {
+    rpc broken(BrokenRequest) returns (BrokenResponse);
+    rpc streamBroken(BrokenRequest) returns (stream BrokenResponse);
+}
+
