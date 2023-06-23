@@ -1,5 +1,7 @@
 # Greenfield
 
+Greenfield is a pervasive distributed system that manages Cleaning Robots deployed throughout the city. These robots act as peers, working together to autonomously navigate and clean various areas. Advanced technologies are utilized to enhance efficiency and maintain cleanliness.
+
 ## Technologies
 
 - gRPC
