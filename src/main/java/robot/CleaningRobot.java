@@ -19,6 +19,8 @@ import robot.grpc.HeartbeatServiceClient;
 import robot.grpc.HeartbeatServiceImpl;
 import robot.grpc.BrokenServiceClient;
 import robot.grpc.BrokenServiceImpl;
+import robot.grpc.FixedServiceClient;
+import robot.grpc.FixedServiceImpl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,6 +47,7 @@ public class CleaningRobot implements ICleaningRobot {
     private volatile List<CleaningRobotInfo> activeCleaningRobots;
     
     private Boolean isBroken;
+    private Boolean atTheMechanic;
     private CleaningRobotInfo myTimestampRequestImBroken;
     private List<CleaningRobotInfo> cleaningRobotsWithTimestampGreaterThanMine;
     private HashMap<CleaningRobotInfo, Boolean> responseCleaningRobotsISentThatImBroken;
@@ -83,6 +86,7 @@ public class CleaningRobot implements ICleaningRobot {
         this.activeCleaningRobots = new ArrayList<CleaningRobotInfo>();
 
         this.isBroken = false;
+        this.atTheMechanic = false;
         this.myTimestampRequestImBroken = new CleaningRobotInfo(this.id, this.host, this.port, this.district, -1);
         this.responseCleaningRobotsISentThatImBroken = new HashMap<CleaningRobotInfo, Boolean>();
         this.cleaningRobotsWithTimestampGreaterThanMine = new ArrayList<CleaningRobotInfo>();
@@ -109,6 +113,7 @@ public class CleaningRobot implements ICleaningRobot {
                                        .addService(new GoodbyeServiceImpl(this))
                                        .addService(new HeartbeatServiceImpl(this))
                                        .addService(new BrokenServiceImpl(this))
+                                       .addService(new FixedServiceImpl(this))
                                        .build();
     }
     
@@ -174,7 +179,19 @@ public class CleaningRobot implements ICleaningRobot {
             return this.isBroken;
         }
     }
-  
+
+    public void setImAtTheMechanic(Boolean atTheMechanic) {
+        synchronized(this.atTheMechanic) {
+            this.atTheMechanic = atTheMechanic;
+        }
+    }
+ 
+    public Boolean getImAtTheMechanic() {
+        synchronized(this.atTheMechanic) {
+            return this.atTheMechanic;
+        }
+    }
+
     public void setMyTimestampRequestImBroken(long timestamp) {
         synchronized(this.myTimestampRequestImBroken) {
             this.myTimestampRequestImBroken.timestamp = timestamp;
@@ -243,9 +260,20 @@ public class CleaningRobot implements ICleaningRobot {
         });
     }
 
-    public void sendImFixedToCleaningRobotsWithTimestampGreaterThanMine() {
+    public void sendImFixedToCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo) {
+        System.out.println("Cleaning robot " + this.id + " sent to cleaning robot " + cleaningRobotInfo.id + " that it is fixed");
+        try {
+            FixedServiceClient.asynchronousStreamCall(cleaningRobotInfo, this);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }  
+    }
+    
+    public void sendImFixedToCleaningRobotsWithTimestampGreaterThanMineAll() {
         synchronized(this.cleaningRobotsWithTimestampGreaterThanMine) {
-             
+            this.cleaningRobotsWithTimestampGreaterThanMine.forEach(cleaningRobotInfo -> {
+                sendImFixedToCleaningRobotsWithTimestampGreaterThanMine(cleaningRobotInfo);
+            });
         } 
     }
 
@@ -255,6 +283,12 @@ public class CleaningRobot implements ICleaningRobot {
 
     public void startMalfunctionsThread() {
         this.malfunctionsThread.start();
+    }
+
+    public void notifyMalfunctionsThread() {
+        synchronized(this.malfunctionsThread) {
+            this.malfunctionsThread.notify();
+        }
     }
 
     public void stopMalfunctionsThread() {

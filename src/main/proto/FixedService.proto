@@ -2,7 +2,11 @@ syntax = "proto3";
 package proto.grpc;
 
 message FixedRequest {
-    string message = 1;
+    int32 id = 1;
+    string host = 2;
+    string port = 3;
+    int32 district = 4;
+    string message = 5;
 }
 
 message FixedResponse {

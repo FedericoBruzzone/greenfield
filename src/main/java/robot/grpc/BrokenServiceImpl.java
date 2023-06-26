@@ -23,7 +23,10 @@ public class BrokenServiceImpl extends BrokenServiceImplBase {
                                                                     request.getTimestamp());
       
         BrokenResponse response = null;
-        if(this.cleaningRobot.getMyTimestampRequestImBroken() == -1) {
+        if(this.cleaningRobot.getImAtTheMechanic()) {
+            System.out.println("Sono il robot " + this.cleaningRobot.getId() + " e sono dal meccanico");
+            response = BrokenResponse.newBuilder().setMessage("NO OK").build();
+        } else if(this.cleaningRobot.getMyTimestampRequestImBroken() == -1) {
             response = BrokenResponse.newBuilder().setMessage("OK").build();
         } else if(!this.cleaningRobot.getIsBroken()) {
             response = BrokenResponse.newBuilder().setMessage("OK").build();
@@ -34,7 +37,7 @@ public class BrokenServiceImpl extends BrokenServiceImplBase {
                   this.cleaningRobot.getMyTimestampRequestImBroken() < cleaningRobotInfo.timestamp) {
             this.cleaningRobot.addCleaningRobotsWithTimestampGreaterThanMine(cleaningRobotInfo);            
             response = BrokenResponse.newBuilder().setMessage("NO OK").build();
-        }          
+        }  
 
         // Se sei this é dal meccanico add cleaningRobotInfo to brokenRobotList
         responseObserver.onNext(response);

@@ -39,7 +39,7 @@ public class SendAverageThread extends Thread {
             MqttMessageAverageId mqttMessageAverageId = new MqttMessageAverageId(measurementList, this.id);
 
             String measurementStreamJson = gson.toJson(mqttMessageAverageId); 
-            System.out.println("[SendAverageThread] send " + measurementStreamJson + " to topic " + district);
+            // System.out.println("[SendAverageThread] send " + measurementStreamJson + " to topic " + district);
             mqttClientHandler.publishMessage(measurementStreamJson, String.valueOf(district));
         }
     }

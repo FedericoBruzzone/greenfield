@@ -15,17 +15,22 @@ public interface ICleaningRobot {
 
     public void setIsBroken(Boolean isBroken); 
     public Boolean getIsBroken(); 
+    public void setImAtTheMechanic(Boolean atTheMechanic); 
+    public Boolean getImAtTheMechanic(); 
     public void setMyTimestampRequestImBroken(long timestamp); 
     public long getMyTimestampRequestImBroken(); 
     public void sendImBroken(CleaningRobotInfo cleaningRobotInfo, CleaningRobotInfo myTimestampRequestImBroken); 
     public void sendImBrokenToAll(); 
     public void createMalfunctionsThread(); 
     public void startMalfunctionsThread(); 
+    public void notifyMalfunctionsThread(); 
     public void stopMalfunctionsThread(); 
     public void addCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo); 
     public void removeCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo); 
     public void removeAllCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo); 
     public void setResponseCleaningRobotsISentThatImBroken(CleaningRobotInfo cleaningRobotInfo, Boolean response); 
+    public void sendImFixedToCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo); 
+    public void sendImFixedToCleaningRobotsWithTimestampGreaterThanMineAll(); 
 
     public void setAdministratorServerHandler(Client client, String serverURI);
     public void setAdministratorServerHandler(AdministratorServerHandler administratorServerHandler);

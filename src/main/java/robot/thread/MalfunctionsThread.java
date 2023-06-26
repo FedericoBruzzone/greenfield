@@ -31,27 +31,45 @@ public class MalfunctionsThread extends Thread {
             }
             int randomNum = 1 + (int)(Math.random() * 10);
             System.out.println("Random num: " + randomNum);
-            if (randomNum == 1) {
+            if (randomNum % 2 == 0) {
                 cleaningRobot.setIsBroken(true);
                 cleaningRobot.sendImBrokenToAll();
                 System.out.println("[MalfunctionsThread]: Robot is broken");
 
-                Boolean allTrue = cleaningRobot.getResponseCleaningRobotsISentThatImBroken()
-                                               .values()
-                                               .stream()
-                                               .allMatch(Boolean::booleanValue);
-                
-                System.out.println("allTrue: " + allTrue);
+                while(true) {           
+                    Boolean allTrue = cleaningRobot.getResponseCleaningRobotsISentThatImBroken()
+                                                   .values()
+                                                   .stream()
+                                                   .allMatch(Boolean::booleanValue);
 
-                if (cleaningRobot.getIsBroken() && allTrue) {
-                    try {
-                        // Mechanic repairs the robot
-                        Thread.sleep(10000);          
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    System.out.println("allTrue: " + allTrue);
+                    System.out.println("ALL: " + cleaningRobot.getResponseCleaningRobotsISentThatImBroken());
+                    
+                    if (allTrue) {
+                        try {
+                            System.out.println("[MalfunctionsThread]: Mechanic repairs the robot");
+                            cleaningRobot.setImAtTheMechanic(true);
+                            Thread.sleep(10000);          
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        cleaningRobot.setIsBroken(false);
+                        cleaningRobot.setImAtTheMechanic(false);
+                        cleaningRobot.sendImFixedToCleaningRobotsWithTimestampGreaterThanMineAll();
+                        break;    
                     }
-                    cleaningRobot.setIsBroken(false);
-                    cleaningRobot.sendImFixedToCleaningRobotsWithTimestampGreaterThanMine();
+
+                    if (cleaningRobot.getIsBroken()) {
+                        synchronized(this) {
+                            try {
+                                System.out.println("[MalfunctionsThread]: Waiting room");
+                                this.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
                 }
             } 
         }
