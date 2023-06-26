@@ -1,0 +1,16 @@
+syntax = "proto3";
+package proto.grpc;
+
+message FixedRequest {
+    string message = 1;
+}
+
+message FixedResponse {
+    string message = 1;
+}
+
+service FixedService {
+    rpc broken(FixedRequest) returns (FixedResponse);
+    rpc streamFixed(FixedRequest) returns (stream FixedResponse);
+}
+

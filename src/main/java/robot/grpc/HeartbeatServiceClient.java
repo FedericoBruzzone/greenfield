@@ -37,7 +37,7 @@ public class HeartbeatServiceClient {
             }
             public void onCompleted() {
                 // System.out.println("onCompleted");
-                channel.shutdownNow();
+                channel.shutdown();
             }
         });
         channel.awaitTermination(5, TimeUnit.SECONDS);

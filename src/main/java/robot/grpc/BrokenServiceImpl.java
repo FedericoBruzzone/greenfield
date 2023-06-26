@@ -38,6 +38,6 @@ public class BrokenServiceImpl extends BrokenServiceImplBase {
 
         // Se sei this é dal meccanico add cleaningRobotInfo to brokenRobotList
         responseObserver.onNext(response);
-        // responseObserver.onCompleted();
+        responseObserver.onCompleted();
     }
 }

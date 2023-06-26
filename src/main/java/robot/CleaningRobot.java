@@ -241,7 +241,12 @@ public class CleaningRobot implements ICleaningRobot {
         this.responseCleaningRobotsISentThatImBroken.forEach((cleaningRobotInfo, response) -> {
                 sendImBroken(cleaningRobotInfo, myTimestampRequestImBroken);
         });
-        System.out.println("QUasi alla fine");
+    }
+
+    public void sendImFixedToCleaningRobotsWithTimestampGreaterThanMine() {
+        synchronized(this.cleaningRobotsWithTimestampGreaterThanMine) {
+             
+        } 
     }
 
     public void createMalfunctionsThread() {
@@ -280,7 +285,7 @@ public class CleaningRobot implements ICleaningRobot {
         }
         RobotAddResponse robotAddResponse = clientResponse.getEntity(RobotAddResponse.class);
         // System.out.println("Response: " + robotAddResponse);        
-        //
+
         this.district = robotAddResponse.district;
         synchronized(this.activeCleaningRobots) {
             if (robotAddResponse.listActiveCleaningRobot != null) {
@@ -511,7 +516,6 @@ public class CleaningRobot implements ICleaningRobot {
 
             cleaningRobot.start();
             
-
             int choice;
             printMenu();
             while(true) { 

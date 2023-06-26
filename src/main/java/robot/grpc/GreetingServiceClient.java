@@ -35,7 +35,7 @@ public class GreetingServiceClient {
                 System.out.println("Error! " + throwable.getMessage());
             }
             public void onCompleted() {
-                channel.shutdownNow();
+                channel.shutdown();
             }
         });
         channel.awaitTermination(10, TimeUnit.SECONDS);

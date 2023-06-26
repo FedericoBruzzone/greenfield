@@ -23,9 +23,9 @@ public class MalfunctionsThread extends Thread {
      * This method simulates the robot's malfunctions.
      */
     public void run() {
-        while (!cleaningRobot.getIsBroken()) {
+        while (true) {
             try {
-                Thread.sleep(1000); // * 10           
+                Thread.sleep(10000); // * 10           
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -35,6 +35,24 @@ public class MalfunctionsThread extends Thread {
                 cleaningRobot.setIsBroken(true);
                 cleaningRobot.sendImBrokenToAll();
                 System.out.println("[MalfunctionsThread]: Robot is broken");
+
+                Boolean allTrue = cleaningRobot.getResponseCleaningRobotsISentThatImBroken()
+                                               .values()
+                                               .stream()
+                                               .allMatch(Boolean::booleanValue);
+                
+                System.out.println("allTrue: " + allTrue);
+
+                if (cleaningRobot.getIsBroken() && allTrue) {
+                    try {
+                        // Mechanic repairs the robot
+                        Thread.sleep(10000);          
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    cleaningRobot.setIsBroken(false);
+                    cleaningRobot.sendImFixedToCleaningRobotsWithTimestampGreaterThanMine();
+                }
             } 
         }
     }

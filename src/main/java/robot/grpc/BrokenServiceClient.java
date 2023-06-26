@@ -33,22 +33,16 @@ public class BrokenServiceClient {
         stub.streamBroken(request, new StreamObserver<BrokenResponse>() {
             public void onNext(BrokenResponse brokenResponse) {
                 if(brokenResponse.getMessage().equals("OK")) {
-                    System.out.println("We are OK");
                     cleaningRobot.setResponseCleaningRobotsISentThatImBroken(cleaningRobotInfo, true); 
                 }
-                Boolean allTrue = cleaningRobot.getResponseCleaningRobotsISentThatImBroken()
-                                               .values()
-                                               .stream()
-                                               .allMatch(Boolean::booleanValue); 
-                System.out.println("All true? : " + allTrue);
             }
 
             public void onError(Throwable throwable) {
                 System.out.println("Error! " + throwable.getMessage());
             }
+
             public void onCompleted() {
-                // System.out.println("onCompleted");
-                channel.shutdownNow();
+                channel.shutdown();
             }
         });
         channel.awaitTermination(5, TimeUnit.SECONDS);
