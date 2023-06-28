@@ -31,7 +31,7 @@ public class GoodbyeServiceClient {
                 System.out.println(goodbyeResponse.getMessage());
             }
             public void onError(Throwable throwable) {
-                System.out.println("Error! " + throwable.getMessage());
+                System.out.println("Goodbye Error! " + throwable.getMessage());
             }
             public void onCompleted() {
                 channel.shutdown();

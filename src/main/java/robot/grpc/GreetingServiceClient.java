@@ -32,7 +32,7 @@ public class GreetingServiceClient {
                 // System.out.println(greetingResponse.getMessage());
             }
             public void onError(Throwable throwable) {
-                System.out.println("Error! " + throwable.getMessage());
+                System.out.println("Greeting Error! " + throwable.getMessage());
             }
             public void onCompleted() {
                 channel.shutdown();

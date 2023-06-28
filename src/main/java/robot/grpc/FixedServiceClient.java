@@ -33,7 +33,7 @@ public class FixedServiceClient {
             }
 
             public void onError(Throwable throwable) {
-                System.out.println("Error! " + throwable.getMessage());
+                System.out.println("Fixed Error! " + throwable.getMessage());
             }
 
             public void onCompleted() {

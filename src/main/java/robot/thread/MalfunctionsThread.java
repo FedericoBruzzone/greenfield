@@ -10,6 +10,7 @@ import robot.CleaningRobot;
 public class MalfunctionsThread extends Thread {
      
     private CleaningRobot cleaningRobot;
+    private volatile Boolean needFix = false;
 
     /**
      * Constructor a new MalfunctionsThread.
@@ -18,20 +19,28 @@ public class MalfunctionsThread extends Thread {
     public MalfunctionsThread(CleaningRobot cleaningRobot) {
         this.cleaningRobot = cleaningRobot;
     } 
-    
+ 
+    /**
+     * This method sets the needFix attribute.
+     */
+    public void setNeedFix(Boolean needFix) {
+        this.needFix = needFix;
+    }
+
     /**
      * This method simulates the robot's malfunctions.
      */
     public void run() {
         while (true) {
             try {
-                Thread.sleep(10000); // * 10           
+                Thread.sleep(1000 * 10);           
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             int randomNum = 1 + (int)(Math.random() * 10);
             System.out.println("Random num: " + randomNum);
-            if (randomNum % 2 == 0) {
+
+            if (randomNum % 2 == 0 || needFix) {
                 cleaningRobot.setIsBroken(true);
                 cleaningRobot.sendImBrokenToAll();
                 System.out.println("[MalfunctionsThread]: Robot is broken");
@@ -42,17 +51,18 @@ public class MalfunctionsThread extends Thread {
                                                    .stream()
                                                    .allMatch(Boolean::booleanValue);
 
-                    System.out.println("allTrue: " + allTrue);
-                    System.out.println("ALL: " + cleaningRobot.getResponseCleaningRobotsISentThatImBroken());
+                    // System.out.println("allTrue: " + allTrue);
+                    // System.out.println("ALL: " + cleaningRobot.getResponseCleaningRobotsISentThatImBroken());
                     
-                    if (allTrue) {
+                    if (allTrue || cleaningRobot.getResponseCleaningRobotsISentThatImBroken().isEmpty()) {
                         try {
                             System.out.println("[MalfunctionsThread]: Mechanic repairs the robot");
                             cleaningRobot.setImAtTheMechanic(true);
-                            Thread.sleep(10000);          
+                            Thread.sleep(1000 * 10);          
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
+                        this.setNeedFix(false);
                         cleaningRobot.setIsBroken(false);
                         cleaningRobot.setImAtTheMechanic(false);
                         cleaningRobot.sendImFixedToCleaningRobotsWithTimestampGreaterThanMineAll();

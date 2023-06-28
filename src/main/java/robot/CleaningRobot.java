@@ -216,7 +216,7 @@ public class CleaningRobot implements ICleaningRobot {
         }
     }
 
-    public void removeAllCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo) {
+    public void removeAllCleaningRobotsWithTimestampGreaterThanMine() {
         synchronized(this.cleaningRobotsWithTimestampGreaterThanMine) {
             this.cleaningRobotsWithTimestampGreaterThanMine.clear();
         }
@@ -225,6 +225,18 @@ public class CleaningRobot implements ICleaningRobot {
     public void setResponseCleaningRobotsISentThatImBroken(CleaningRobotInfo cleaningRobotInfo, Boolean response) {
         synchronized(this.responseCleaningRobotsISentThatImBroken) {
             this.responseCleaningRobotsISentThatImBroken.put(cleaningRobotInfo, response);
+        }
+    }
+    
+    public void removeResponseCleaningRobotsISentThatImBroken(CleaningRobotInfo cleaningRobotInfo) {
+        synchronized(this.responseCleaningRobotsISentThatImBroken) {
+            this.responseCleaningRobotsISentThatImBroken.remove(cleaningRobotInfo);
+        }
+    }
+
+    public void removeAllResponseCleaningRobotsISentThatImBroken() {
+        synchronized(this.responseCleaningRobotsISentThatImBroken) {
+            this.responseCleaningRobotsISentThatImBroken.clear();
         }
     }
 
@@ -275,6 +287,14 @@ public class CleaningRobot implements ICleaningRobot {
                 sendImFixedToCleaningRobotsWithTimestampGreaterThanMine(cleaningRobotInfo);
             });
         } 
+        this.removeAllResponseCleaningRobotsISentThatImBroken();
+        this.removeAllCleaningRobotsWithTimestampGreaterThanMine();
+        System.out.println("Remove all cleaning robot with timestamp greater than mine " + this.cleaningRobotsWithTimestampGreaterThanMine);
+        System.out.println("Remove response cleanign robot i sent that im broken" + this.responseCleaningRobotsISentThatImBroken);
+    }
+
+    public void setNeedFixMalfunctionThread(Boolean needFix) {
+        this.malfunctionsThread.setNeedFix(needFix);
     }
 
     public void createMalfunctionsThread() {
@@ -526,6 +546,10 @@ public class CleaningRobot implements ICleaningRobot {
         System.exit(0);
     }
 
+    public void fix() {
+        this.setNeedFixMalfunctionThread(true);
+    }
+
     public void start() {
         this.registerToAdministratorServer();
         this.startGrpcServer();
@@ -567,7 +591,7 @@ public class CleaningRobot implements ICleaningRobot {
                             cleaningRobot.systemExit0();
                         case 2:
                             System.out.println("\tFix");
-                            // TODO
+                            cleaningRobot.fix();
                             break;
                         default:
                             System.out.println("This choice is not available.");

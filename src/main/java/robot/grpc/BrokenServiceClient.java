@@ -39,6 +39,7 @@ public class BrokenServiceClient {
 
             public void onError(Throwable throwable) {
                 System.out.println("Error! " + throwable.getMessage());
+                cleaningRobot.setResponseCleaningRobotsISentThatImBroken(cleaningRobotInfo, true); 
             }
 
             public void onCompleted() {

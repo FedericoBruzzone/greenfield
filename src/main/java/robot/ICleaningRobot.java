@@ -1,6 +1,7 @@
 package robot;
 
 import java.util.List;
+import java.util.HashMap;
 import com.sun.jersey.api.client.Client;
 
 public interface ICleaningRobot {
@@ -27,10 +28,13 @@ public interface ICleaningRobot {
     public void stopMalfunctionsThread(); 
     public void addCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo); 
     public void removeCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo); 
-    public void removeAllCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo); 
+    public void removeAllCleaningRobotsWithTimestampGreaterThanMine(); 
     public void setResponseCleaningRobotsISentThatImBroken(CleaningRobotInfo cleaningRobotInfo, Boolean response); 
     public void sendImFixedToCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo); 
     public void sendImFixedToCleaningRobotsWithTimestampGreaterThanMineAll(); 
+    public void removeResponseCleaningRobotsISentThatImBroken(CleaningRobotInfo cleaningRobotInfo); 
+    public void removeAllResponseCleaningRobotsISentThatImBroken(); 
+    public HashMap<CleaningRobotInfo, Boolean> getResponseCleaningRobotsISentThatImBroken();
 
     public void setAdministratorServerHandler(Client client, String serverURI);
     public void setAdministratorServerHandler(AdministratorServerHandler administratorServerHandler);
@@ -68,5 +72,6 @@ public interface ICleaningRobot {
     public void startAllThreads();
     public void stopAllThreads();
     public void systemExit0();
+    public void fix();
     public void start();
 }

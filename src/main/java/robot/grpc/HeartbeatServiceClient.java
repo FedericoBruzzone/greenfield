@@ -30,7 +30,7 @@ public class HeartbeatServiceClient {
                 // System.out.println("onNext");
             }
             public void onError(Throwable throwable) {
-                // System.out.println("Error! " + throwable.getMessage());
+                System.out.println("Heartbeat Error! " + throwable.getMessage());
                 cleaningRobot.removeUnactiveCleaningRobot(cleaningRobotInfo); 
                 cleaningRobot.removeCleaningRobotFromAdministratorServer(cleaningRobotInfo);
                 cleaningRobot.sendHeartbeatCrashToAll(cleaningRobotInfo.id);
