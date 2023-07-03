@@ -34,12 +34,14 @@ public class BrokenServiceClient {
             public void onNext(BrokenResponse brokenResponse) {
                 if(brokenResponse.getMessage().equals("OK")) {
                     cleaningRobot.setResponseCleaningRobotsISentThatImBroken(cleaningRobotInfo, true); 
+                    cleaningRobot.notifyMalfunctionsThread();
                 }
             }
 
             public void onError(Throwable throwable) {
                 System.out.println("Error! " + throwable.getMessage());
                 cleaningRobot.setResponseCleaningRobotsISentThatImBroken(cleaningRobotInfo, true); 
+                cleaningRobot.notifyMalfunctionsThread();
             }
 
             public void onCompleted() {

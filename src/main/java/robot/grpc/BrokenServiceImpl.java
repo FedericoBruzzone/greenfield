@@ -21,7 +21,7 @@ public class BrokenServiceImpl extends BrokenServiceImplBase {
                                                                     request.getPort(),
                                                                     request.getDistrict(),
                                                                     request.getTimestamp());
-      
+        
         BrokenResponse response = null;
         if(this.cleaningRobot.getImAtTheMechanic()) {
             this.cleaningRobot.addCleaningRobotsWithTimestampGreaterThanMine(cleaningRobotInfo);

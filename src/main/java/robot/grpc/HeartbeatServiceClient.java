@@ -34,6 +34,17 @@ public class HeartbeatServiceClient {
                 cleaningRobot.removeUnactiveCleaningRobot(cleaningRobotInfo); 
                 cleaningRobot.removeCleaningRobotFromAdministratorServer(cleaningRobotInfo);
                 cleaningRobot.sendHeartbeatCrashToAll(cleaningRobotInfo.id);
+                if (cleaningRobot.getIsBroken()) {
+                    CleaningRobotInfo robotKey = cleaningRobot.getResponseCleaningRobotsISentThatImBroken()
+                                                              .keySet()
+                                                              .stream()
+                                                              .filter(robot -> robot.id == cleaningRobotInfo.id)
+                                                              .findFirst()
+                                                              .orElse(null);
+                    if (robotKey != null) {
+                        cleaningRobot.setResponseCleaningRobotsISentThatImBroken(robotKey, true);
+                    }
+                }
             }
             public void onCompleted() {
                 // System.out.println("onCompleted");
