@@ -11,6 +11,7 @@ public class MalfunctionsThread extends Thread {
      
     private CleaningRobot cleaningRobot;
     private volatile Boolean needFix = false;
+    private volatile Boolean stop;
 
     /**
      * Constructor a new MalfunctionsThread.
@@ -18,6 +19,7 @@ public class MalfunctionsThread extends Thread {
      */
     public MalfunctionsThread(CleaningRobot cleaningRobot) {
         this.cleaningRobot = cleaningRobot;
+        this.stop = false;
     } 
  
     /**
@@ -25,17 +27,26 @@ public class MalfunctionsThread extends Thread {
      */
     public void setNeedFix(Boolean needFix) {
         this.needFix = needFix;
+        this.interrupt();
+    }
+        
+    /**
+     * This method stops the thread.
+     */
+    public void stopMeGently() {
+        this.stop = true;
     }
 
     /**
      * This method simulates the robot's malfunctions.
      */
     public void run() {
-        while (true) {
+        while (!stop) {
             try {
                 Thread.sleep(1000 * 10);           
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println("[MalfunctionsThread]: Interrupted, need mechanical");
+                // e.printStackTrace();
             }
             int randomNum = 1 + (int)(Math.random() * 10);
             System.out.println("Random num: " + randomNum);
@@ -60,7 +71,7 @@ public class MalfunctionsThread extends Thread {
                             cleaningRobot.setImAtTheMechanic(true);
                             Thread.sleep(1000 * 10);          
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            // e.printStackTrace();
                         }
                         this.setNeedFix(false);
                         cleaningRobot.setIsBroken(false);
@@ -75,7 +86,7 @@ public class MalfunctionsThread extends Thread {
                                 System.out.println("[MalfunctionsThread]: Waiting room");
                                 this.wait();
                             } catch (InterruptedException e) {
-                                e.printStackTrace();
+                                // e.printStackTrace();
                             }
                         }
                     }

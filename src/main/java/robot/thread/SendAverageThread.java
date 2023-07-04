@@ -15,6 +15,7 @@ public class SendAverageThread extends Thread {
     private MqttClientHandler mqttClientHandler;
     private int district;
     private int id;
+    private volatile Boolean stop;
 
     public SendAverageThread(MeasurementStream measurementStream, 
                              MqttClientHandler mqttClientHandler, 
@@ -24,12 +25,17 @@ public class SendAverageThread extends Thread {
         this.mqttClientHandler = mqttClientHandler;
         this.district = district;
         this.id = id;
+        this.stop = false;
+    }
+
+    public void stopMeGently() {
+        this.stop = true;
     }
 
     public void run() {
         Gson gson = new Gson();
 
-        while (true) {
+        while (!stop) {
             try {
                 Thread.sleep(15000);
             } catch (InterruptedException e) {

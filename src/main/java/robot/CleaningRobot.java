@@ -251,7 +251,7 @@ public class CleaningRobot implements ICleaningRobot {
         try {
             BrokenServiceClient.asynchronousStreamCall(cleaningRobotInfo, this, myTimestampRequestImBroken);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
     
@@ -277,7 +277,7 @@ public class CleaningRobot implements ICleaningRobot {
         try {
             FixedServiceClient.asynchronousStreamCall(cleaningRobotInfo, this);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }  
     }
     
@@ -314,7 +314,16 @@ public class CleaningRobot implements ICleaningRobot {
     public void stopMalfunctionsThread() {
         this.malfunctionsThread.stop();
     }
-
+    
+    public void stopGentlyMalfunctionsThread() {
+        this.malfunctionsThread.stopMeGently();
+        try {
+            this.malfunctionsThread.join();
+        } catch (InterruptedException e) {
+            // e.printStackTrace();
+        }
+    }
+    
     ////////////////////////////////////////////////////////////////////////////////
     // Administrator server                                                       //
     ////////////////////////////////////////////////////////////////////////////////
@@ -401,12 +410,39 @@ public class CleaningRobot implements ICleaningRobot {
         this.pm10Simulator.stop();
     }
     
+    public void stopGentlyPm10Simulator() {
+        this.pm10Simulator.stopMeGently();
+        try {
+            this.pm10Simulator.join();
+        } catch (InterruptedException e) {
+            // e.printStackTrace();
+        }
+    }
+    
     public void stopComputeAverageThread() {
         this.computeAverageThread.stop();
+    }
+    
+    public void stopGentlyComputeAverageThread() {
+        this.computeAverageThread.stopMeGently();
+        try {
+            this.computeAverageThread.join();
+        } catch (InterruptedException e) {
+            // e.printStackTrace();
+        }
     }
 
     public void stopSendAverageThread() {
         this.sendAverageThread.stop();
+    }
+
+    public void stopGentlySendAverageThread() {
+        this.sendAverageThread.stopMeGently();
+        try {
+            this.sendAverageThread.join();
+        } catch (InterruptedException e) {
+            // e.printStackTrace();
+        }
     }
 
     public void disconnectMqttClient() {
@@ -422,10 +458,8 @@ public class CleaningRobot implements ICleaningRobot {
             // System.out.println("Server started!");
             // grpcServer.awaitTermination();
         } catch (IOException e) { 
-            e.printStackTrace();
-        }// } catch (InterruptedException e) {
-        //     e.printStackTrace();
-        // }
+            // e.printStackTrace();
+        }
     }
 
     public void stopGrpcServer() {
@@ -437,7 +471,7 @@ public class CleaningRobot implements ICleaningRobot {
             // greetingServiceClient.asynchronousStreamCall(host, port, this);
             GreetingServiceClient.asynchronousStreamCall(cleaningRobotInfo, this);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -453,7 +487,7 @@ public class CleaningRobot implements ICleaningRobot {
         try {
             GoodbyeServiceClient.asynchronousStreamCall(cleaningRobotInfo, this);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -469,7 +503,7 @@ public class CleaningRobot implements ICleaningRobot {
         try {
             HeartbeatServiceClient.asynchronousStreamCall(cleaningRobotInfo, this);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -477,7 +511,7 @@ public class CleaningRobot implements ICleaningRobot {
         try {
             HeartbeatServiceClient.asynchronousStreamCallCrash(cleaningRobotInfo, cleaningRobotIdCrashed);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     } 
 
@@ -509,6 +543,15 @@ public class CleaningRobot implements ICleaningRobot {
         this.heartbeatThread.stop();
     }
 
+    public void stopGentlyHeartbeatThread() {
+        this.heartbeatThread.stopMeGently();
+        try {
+            this.heartbeatThread.join();
+        } catch (InterruptedException e) {
+            // e.printStackTrace();
+        }
+    }
+    
     ////////////////////////////////////////////////////////////////////////////////
     // Utility                                                                    //
     ////////////////////////////////////////////////////////////////////////////////
@@ -536,13 +579,23 @@ public class CleaningRobot implements ICleaningRobot {
         this.stopMalfunctionsThread();
     }
 
+    public void stopGentlyAllThreads() {
+        this.stopGentlyPm10Simulator();
+        this.stopGentlyComputeAverageThread();
+        this.stopGentlySendAverageThread();
+        this.stopGentlyMalfunctionsThread();
+    }
+
     public void systemExit0() {
-        // TODO complete any operation at the mechanic 
-        this.removeFromAdministratorServer();
+        this.stopGentlyMalfunctionsThread();
         this.sendGoodbyeToAll(); 
-        this.stopAllThreads();
-        this.disconnectMqttClient();
         this.stopGrpcServer();
+        this.stopPm10Simulator();
+        this.stopComputeAverageThread();
+        this.stopSendAverageThread();
+        this.stopGentlyHeartbeatThread();
+        this.removeFromAdministratorServer();
+        this.disconnectMqttClient();
         System.exit(0);
     }
 
@@ -598,11 +651,11 @@ public class CleaningRobot implements ICleaningRobot {
                             break;
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                 } 
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         } 
     }
 

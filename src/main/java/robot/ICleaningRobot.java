@@ -26,6 +26,7 @@ public interface ICleaningRobot {
     public void startMalfunctionsThread(); 
     public void notifyMalfunctionsThread(); 
     public void stopMalfunctionsThread(); 
+    public void stopGentlyMalfunctionsThread();
     public void addCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo); 
     public void removeCleaningRobotsWithTimestampGreaterThanMine(CleaningRobotInfo cleaningRobotInfo); 
     public void removeAllCleaningRobotsWithTimestampGreaterThanMine(); 
@@ -50,8 +51,11 @@ public interface ICleaningRobot {
     public void startComputeAverageThread();
     public void startSendAverageThread();
     public void stopPm10Simulator();
+    public void stopGentlyPm10Simulator();
     public void stopComputeAverageThread();
+    public void stopGentlyComputeAverageThread();
     public void stopSendAverageThread();
+    public void stopGentlySendAverageThread();
     public void disconnectMqttClient();
 
     public void startGrpcServer();
@@ -67,10 +71,12 @@ public interface ICleaningRobot {
     public void createHeartbeatThread();
     public void startHeartbeatThread();
     public void stopHeartbeatThread();
+    public void stopGentlyHeartbeatThread();
     
     public void createAllThreads();
     public void startAllThreads();
     public void stopAllThreads();
+    public void stopGentlyAllThreads();
     public void systemExit0();
     public void fix();
     public void start();

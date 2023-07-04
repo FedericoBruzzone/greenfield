@@ -15,11 +15,13 @@ public class ComputeAverageThread extends Thread {
     private MeasurementStream measurementStream;
     private CleaningRobot cleaningRobot;
     private int id = 1;
+    private volatile Boolean stop;
 
     public ComputeAverageThread(SlidingWindow slidingWindow, MeasurementStream measurementStream, CleaningRobot cleaningRobot) {
         this.slidingWindow = slidingWindow;
         this.measurementStream = measurementStream;
         this.cleaningRobot = cleaningRobot;
+        this.stop = false;
     }
 
     public double mean(List<Measurement> measurements) {
@@ -29,8 +31,12 @@ public class ComputeAverageThread extends Thread {
                            .orElse(0.0d) / measurements.size();
     }
 
+    public void stopMeGently() {
+        this.stop = true; 
+    }
+
     public void run() {
-        while (true) {
+        while (!stop) {
             List<Measurement> measurements = this.slidingWindow.readAllAndClean();
             Measurement measurementMean = new Measurement(
                     Integer.toString(this.cleaningRobot.getId()),
