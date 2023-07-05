@@ -46,6 +46,8 @@ public class CleaningRobot implements ICleaningRobot {
     private int district; 
     private volatile List<CleaningRobotInfo> activeCleaningRobots;
     
+    private final Object lockIsBroken = new Object();
+    private final Object lockAtTheMechanic= new Object();
     private volatile Boolean isBroken;
     private volatile Boolean atTheMechanic;
     private CleaningRobotInfo myTimestampRequestImBroken;
@@ -68,7 +70,6 @@ public class CleaningRobot implements ICleaningRobot {
     private Server grpcServer;
     private HeartbeatThread heartbeatThread;
     
-    private final Object lock = new Object();
     
     public CleaningRobot() {}
 
@@ -165,25 +166,25 @@ public class CleaningRobot implements ICleaningRobot {
     // Mechanical                                                                 //
     ////////////////////////////////////////////////////////////////////////////////
     public void setIsBroken(Boolean isBroken) {
-        synchronized(this.lock) {
+        synchronized(this.lockIsBroken) {
             this.isBroken = isBroken;
         }
     }
 
     public Boolean getIsBroken() {
-        synchronized(this.lock) {
+        synchronized(this.lockIsBroken) {
             return this.isBroken;
         }
     }
 
     public void setImAtTheMechanic(Boolean atTheMechanic) {
-        synchronized(this.lock) {
+        synchronized(this.lockAtTheMechanic) {
             this.atTheMechanic = atTheMechanic;
         }
     }
  
     public Boolean getImAtTheMechanic() {
-        synchronized(this.lock) {
+        synchronized(this.lockAtTheMechanic) {
             return this.atTheMechanic;
         }
     }

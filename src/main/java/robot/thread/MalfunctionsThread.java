@@ -51,7 +51,7 @@ public class MalfunctionsThread extends Thread {
             int randomNum = 1 + (int)(Math.random() * 10);
             System.out.println("Random num: " + randomNum);
 
-            if (randomNum % 2 == 0 || needFix) {
+            if (randomNum == 1 || needFix) {
                 cleaningRobot.setIsBroken(true);
                 cleaningRobot.sendImBrokenToAll();
                 System.out.println("[MalfunctionsThread]: Robot is broken");
