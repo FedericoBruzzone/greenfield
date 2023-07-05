@@ -52,15 +52,8 @@ public class MqttClientHandler {
         this.client.setCallback(new MqttCallback() {
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-                // System.out.println("Message arrived: " + new String(message.getPayload()));
                 String time = new Timestamp(System.currentTimeMillis()).toString();
                 String receivedMessage = new String(message.getPayload());
-                // System.out.println(client.getClientId() +" Received a Message! - Callback - Thread PID: " + Thread.currentThread().getId() +
-                //             "\n\tTime:    " + time +
-                //             "\n\tTopic:   " + topic +
-                //             "\n\tMessage: " + receivedMessage +
-                //             "\n\tQoS:     " + message.getQos() + "\n");
-                   
                 MqttMessageAverageId measurementStream = gson.fromJson(receivedMessage, MqttMessageAverageId.class);
 
                 ArrayList<Measurement> measurementList = measurementStream.getMeasurementList(); 

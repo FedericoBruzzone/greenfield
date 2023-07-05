@@ -21,7 +21,7 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
     
     private static CommonCleaningRobots instance;
     private List<CommonCleaningRobot> cleaningRobotsList;
-    private HashMap<Integer, ArrayList<Measurement>> measurementsMap;
+    private final HashMap<Integer, ArrayList<Measurement>> measurementsMap;
     
     /**
      * It is private to prevent the instantiation of the class from outside the class itself.
@@ -52,14 +52,16 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
      * @param cleaningRobot the CommonCleaningRobot object to add
      * @return the CommonCleaningRobot object added
      */
-    public synchronized CommonCleaningRobot add(CommonCleaningRobot cleaningRobot) {
-        if (!checkID(cleaningRobot.getId())) {
-            // throw new RuntimeException("Failed: There is another Cleaning Robot with this ID "+cleaningRobot.getId());
-            return null;
+    public CommonCleaningRobot add(CommonCleaningRobot cleaningRobot) {
+        synchronized(cleaningRobotsList) {
+            if (!checkID(cleaningRobot.getId())) {
+                // throw new RuntimeException("Failed: There is another Cleaning Robot with this ID "+cleaningRobot.getId());
+                return null;
+            }
+            cleaningRobot.setDistrict(buildDistrict());
+            cleaningRobotsList.add(cleaningRobot);
+            return cleaningRobot;
         }
-        cleaningRobot.setDistrict(buildDistrict());
-        cleaningRobotsList.add(cleaningRobot);
-        return cleaningRobot;
     }
    
     /**
@@ -69,12 +71,14 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
      * @return true if the CommonCleaningRobot object has been removed, false otherwise
      */
     public synchronized Boolean remove(CommonCleaningRobot cleaningRobot) {
-        if (cleaningRobot == null) {
-            return false;
+        synchronized(cleaningRobotsList) {
+            if (cleaningRobot == null) {
+                return false;
+            }
+            int lengthCleaningRobotsList = cleaningRobotsList.size();
+            cleaningRobotsList.removeIf(cr -> cr.getId() == cleaningRobot.getId());
+            return lengthCleaningRobotsList - 1 == cleaningRobotsList.size();
         }
-        int lengthCleaningRobotsList = cleaningRobotsList.size();
-        cleaningRobotsList.removeIf(cr -> cr.getId() == cleaningRobot.getId());
-        return lengthCleaningRobotsList - 1 == cleaningRobotsList.size();
     }
     
     /**
@@ -82,10 +86,12 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
      *
      * @return the list of active CommonCleaningRobot
      */
-    public synchronized List<CommonCleaningRobot> getCleaningRobots() {
-        if (cleaningRobotsList != null)
-            return new ArrayList<CommonCleaningRobot>(cleaningRobotsList);
-        return null;
+    public List<CommonCleaningRobot> getCleaningRobots() {
+        synchronized(cleaningRobotsList) {
+            if (cleaningRobotsList != null)
+                return new ArrayList<CommonCleaningRobot>(cleaningRobotsList);
+            return null;
+        }
     }
   
     /** 
@@ -94,12 +100,14 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
      * @param commonCleaningRobot the CommonCleaningRobot object to exclude
      * @return the list of CommonCleaningRobot without the specified commonCleaningRobot
      */
-    public synchronized List<CommonCleaningRobot> getCleaningRobotsWithout(CommonCleaningRobot commonCleaningRobot) {
-        if (cleaningRobotsList != null && commonCleaningRobot != null)
-            return new ArrayList<CommonCleaningRobot>(cleaningRobotsList.stream()
-                                                                    .filter(cleaningRobot -> cleaningRobot.getId() != commonCleaningRobot.getId())
-                                                                    .collect(Collectors.toList()));
-        return null;
+    public List<CommonCleaningRobot> getCleaningRobotsWithout(CommonCleaningRobot commonCleaningRobot) {
+        synchronized(cleaningRobotsList) {
+            if (cleaningRobotsList != null && commonCleaningRobot != null)
+                return new ArrayList<CommonCleaningRobot>(cleaningRobotsList.stream()
+                                                                            .filter(cleaningRobot -> cleaningRobot.getId() != commonCleaningRobot.getId())
+                                                                            .collect(Collectors.toList()));
+            return null;
+        }
     }
 
     /**
@@ -132,15 +140,16 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
      *
      * @param cleaningRobotsList the list of CommonCleaningRobot to set
      */
-    public synchronized void setCleaningRobots(List<CommonCleaningRobot> cleaningRobotsList) {
-        // check if there are duplicate in parameter cleaningRobotsList
-        if (cleaningRobotsList.stream()
-                              .anyMatch(cleaningRobot -> cleaningRobotsList.stream()
-                                                                           .filter(cr -> cr.getId() == cleaningRobot.getId())
-                                                                           .count() > 1)) {
-            throw new RuntimeException("Failed: There are duplicate Cleaning Robots in the list");
+    public void setCleaningRobots(List<CommonCleaningRobot> cleaningRobotsList) {
+        synchronized(cleaningRobotsList) {
+            if (cleaningRobotsList.stream()
+                                  .anyMatch(cleaningRobot -> cleaningRobotsList.stream()
+                                                                               .filter(cr -> cr.getId() == cleaningRobot.getId())
+                                                                               .count() > 1)) {
+                throw new RuntimeException("Failed: There are duplicate Cleaning Robots in the list");
+            }
+            this.cleaningRobotsList = cleaningRobotsList;
         }
-        this.cleaningRobotsList = cleaningRobotsList;
     }
    
     /**
@@ -150,7 +159,8 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
      * @return true if there is not another CommonCleaningRobot with the same ID, false otherwise
      */
     private boolean checkID(int ID) {
-        return !cleaningRobotsList.stream().anyMatch(cleaningRobot -> cleaningRobot.getId() == ID);
+        return !cleaningRobotsList.stream()
+                                  .anyMatch(cleaningRobot -> cleaningRobot.getId() == ID);
     }
    
     /**
@@ -159,11 +169,13 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
      * @param robotId the ID of the robot
      * @param measurements the measurements to add
      */
-    public synchronized void addMeasurementWithId(int robotId, ArrayList<Measurement> measurements) {
-        if (!measurementsMap.containsKey(robotId)) {
-            measurementsMap.put(robotId, new ArrayList<Measurement>());
+    public void addMeasurementWithId(int robotId, ArrayList<Measurement> measurements) {
+        synchronized(measurementsMap) {
+            if (!measurementsMap.containsKey(robotId)) {
+                measurementsMap.put(robotId, new ArrayList<Measurement>());
+            }
+            measurementsMap.get(robotId).addAll(0, measurements);
         }
-        measurementsMap.get(robotId).addAll(0, measurements);
     }
     
     /**
@@ -173,20 +185,22 @@ public final class CommonCleaningRobots implements ICommonCleaningRobots {
      * @param number the number of measurements to consider
      * @return the average of the first n measurements of the specified robot
      */
-    public synchronized float getAverageOfLastNAirPollutionLevelsOfRobot(int robotId, int number) {
-        if (!measurementsMap.containsKey(robotId)) {
-            return 0.0f;
-        }
-        if (measurementsMap.get(robotId).size() < number) {
-            return 0.0f;
-        }
+    public float getAverageOfLastNAirPollutionLevelsOfRobot(int robotId, int number) {
+        synchronized(measurementsMap) {
+            if (!measurementsMap.containsKey(robotId)) {
+                return 0.0f;
+            }
+            if (measurementsMap.get(robotId).size() < number) {
+                return 0.0f;
+            }
 
-        return measurementsMap.get(robotId)
-                              .stream()
-                              .limit(number)
-                              .map(measurement -> measurement.getValue())
-                              .reduce(0.0, (a, b) -> a + b)
-                              .floatValue() / number;
+            return measurementsMap.get(robotId)
+                                  .stream()
+                                  .limit(number)
+                                  .map(measurement -> measurement.getValue())
+                                  .reduce(0.0, (a, b) -> a + b)
+                                  .floatValue() / number;
+        }
     }
 
     /**

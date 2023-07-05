@@ -46,8 +46,8 @@ public class CleaningRobot implements ICleaningRobot {
     private int district; 
     private volatile List<CleaningRobotInfo> activeCleaningRobots;
     
-    private Boolean isBroken;
-    private Boolean atTheMechanic;
+    private volatile Boolean isBroken;
+    private volatile Boolean atTheMechanic;
     private CleaningRobotInfo myTimestampRequestImBroken;
     private List<CleaningRobotInfo> cleaningRobotsWithTimestampGreaterThanMine;
     private HashMap<CleaningRobotInfo, Boolean> responseCleaningRobotsISentThatImBroken;
@@ -65,13 +65,11 @@ public class CleaningRobot implements ICleaningRobot {
     private ComputeAverageThread computeAverageThread;
     private SendAverageThread sendAverageThread;
 
-    // private GreetingServiceClient greetingServiceClient;
-    // private GreetingServiceImpl greetingServiceImpl;
-    // private HeartbeatServiceClient heartbeatServiceClient;
-    // private HeartbeatServiceImpl heartbeatServiceImpl;
     private Server grpcServer;
     private HeartbeatThread heartbeatThread;
-
+    
+    private final Object lock = new Object();
+    
     public CleaningRobot() {}
 
     public CleaningRobot(int id) {
@@ -106,8 +104,6 @@ public class CleaningRobot implements ICleaningRobot {
         this.measurementStream = new MeasurementStream();
 
         // GRPC
-        // this.greetingServiceClient = new GreetingServiceClient();
-        // this.greetingServiceImpl = new GreetingServiceImpl(this);
         this.grpcServer = ServerBuilder.forPort(Integer.valueOf(this.port))
                                        .addService(new GreetingServiceImpl(this))
                                        .addService(new GoodbyeServiceImpl(this))
@@ -169,25 +165,25 @@ public class CleaningRobot implements ICleaningRobot {
     // Mechanical                                                                 //
     ////////////////////////////////////////////////////////////////////////////////
     public void setIsBroken(Boolean isBroken) {
-        synchronized(this.isBroken) {
+        synchronized(this.lock) {
             this.isBroken = isBroken;
         }
     }
 
     public Boolean getIsBroken() {
-        synchronized(this.isBroken) {
+        synchronized(this.lock) {
             return this.isBroken;
         }
     }
 
     public void setImAtTheMechanic(Boolean atTheMechanic) {
-        synchronized(this.atTheMechanic) {
+        synchronized(this.lock) {
             this.atTheMechanic = atTheMechanic;
         }
     }
  
     public Boolean getImAtTheMechanic() {
-        synchronized(this.atTheMechanic) {
+        synchronized(this.lock) {
             return this.atTheMechanic;
         }
     }
@@ -289,8 +285,8 @@ public class CleaningRobot implements ICleaningRobot {
         } 
         this.removeAllResponseCleaningRobotsISentThatImBroken();
         this.removeAllCleaningRobotsWithTimestampGreaterThanMine();
-        System.out.println("Remove all cleaning robot with timestamp greater than mine " + this.cleaningRobotsWithTimestampGreaterThanMine);
-        System.out.println("Remove response cleanign robot i sent that im broken" + this.responseCleaningRobotsISentThatImBroken);
+        // System.out.println("Remove all cleaning robot with timestamp greater than mine " + this.cleaningRobotsWithTimestampGreaterThanMine);
+        // System.out.println("Remove response cleaning robot i sent that i'm broken" + this.responseCleaningRobotsISentThatImBroken);
     }
 
     public void setNeedFixMalfunctionThread(Boolean needFix) {

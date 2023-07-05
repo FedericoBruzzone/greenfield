@@ -45,7 +45,7 @@ public class MalfunctionsThread extends Thread {
             try {
                 Thread.sleep(1000 * 10);           
             } catch (InterruptedException e) {
-                System.out.println("[MalfunctionsThread]: Interrupted, need mechanical");
+                // System.out.println("[MalfunctionsThread]: Interrupted, need mechanical");
                 // e.printStackTrace();
             }
             int randomNum = 1 + (int)(Math.random() * 10);
@@ -61,10 +61,8 @@ public class MalfunctionsThread extends Thread {
                                                    .values()
                                                    .stream()
                                                    .allMatch(Boolean::booleanValue);
-
                     // System.out.println("allTrue: " + allTrue);
                     // System.out.println("ALL: " + cleaningRobot.getResponseCleaningRobotsISentThatImBroken());
-                    
                     if (allTrue || cleaningRobot.getResponseCleaningRobotsISentThatImBroken().isEmpty()) {
                         try {
                             System.out.println("[MalfunctionsThread]: Mechanic repairs the robot");
@@ -79,7 +77,6 @@ public class MalfunctionsThread extends Thread {
                         cleaningRobot.sendImFixedToCleaningRobotsWithTimestampGreaterThanMineAll();
                         break;    
                     }
-
                     if (cleaningRobot.getIsBroken()) {
                         synchronized(this) {
                             try {
@@ -90,7 +87,6 @@ public class MalfunctionsThread extends Thread {
                             }
                         }
                     }
-
                 }
             } 
         }

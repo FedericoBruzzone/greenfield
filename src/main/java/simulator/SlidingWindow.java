@@ -81,7 +81,7 @@ public class SlidingWindow implements Buffer {
                   .limit(this.overlap)
                   .forEach(m -> this.queue.removeFirst());
 
-        this.notify(); 
+        // this.notify(); 
         return new ArrayList<Measurement>(queueClone);
     }
 
