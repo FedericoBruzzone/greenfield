@@ -161,7 +161,7 @@ public class CleaningRobot implements ICleaningRobot {
             System.out.println("Active cleaning robot: " + this.activeCleaningRobots);
         }
     }
-    
+   
     ////////////////////////////////////////////////////////////////////////////////
     // Mechanical                                                                 //
     ////////////////////////////////////////////////////////////////////////////////
